@@ -38,6 +38,7 @@ export function goalRate(
   until: ISODate,
   today: ISODate,
   ctx: DayContext,
+  rest: ReadonlySet<ISODate> = new Set(),
 ): Rate {
   if (until < start) return rate(0, 0);
   if (goal.frequency.kind === 'weekly') {
@@ -64,7 +65,8 @@ export function goalRate(
     if (!appearsOn(goal, ctx.categories, d)) continue;
     const completed = ctx.index.get(checkInKey(goal.id, d))?.completed ?? false;
     if (completed) done += 1;
-    if (completed || d !== today) total += 1;
+    // Le jour en cours et les jours de trêve ne comptent que s'ils sont réussis.
+    if (completed || (d !== today && !rest.has(d))) total += 1;
   }
   return rate(done, total);
 }
@@ -76,6 +78,7 @@ export function categoryRate(
   until: ISODate,
   today: ISODate,
   ctx: DayContext,
+  rest: ReadonlySet<ISODate> = new Set(),
 ): Rate {
   if (until < from) return rate(0, 0);
   let done = 0;
@@ -84,7 +87,7 @@ export function categoryRate(
     for (const s of dayStates(d, ctx)) {
       if (s.goal.categoryId !== categoryId || !s.counts) continue;
       if (s.completed) done += 1;
-      if (s.completed || d !== today) total += 1;
+      if (s.completed || (d !== today && !rest.has(d))) total += 1;
     }
   }
   return rate(done, total);

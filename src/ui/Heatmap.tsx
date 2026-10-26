@@ -1,4 +1,4 @@
-import { SnowflakeIcon } from '@phosphor-icons/react';
+import { CampfireIcon, SnowflakeIcon } from '@phosphor-icons/react';
 import { cn } from '@/lib/cn';
 import type { ISODate } from '@/lib/types';
 
@@ -9,6 +9,8 @@ export type HeatCell = {
   level: 0 | 1 | 2 | 3 | 4 | undefined;
   perfect: boolean;
   frozen: boolean;
+  /** Jour de trêve déclaré. */
+  rest: boolean;
   today: boolean;
   /** Libellé complet pour les lecteurs d'écran. */
   label: string;
@@ -84,6 +86,9 @@ export function Heatmap({ weeks, weekdays, selected, onSelect, label, formatDay 
                 >
                   {formatDay(day)}
                 </span>
+                {cell.rest && (
+                  <CampfireIcon size={10} className="absolute left-0.5 top-0.5 text-frost" />
+                )}
                 {cell.frozen && (
                   <SnowflakeIcon size={10} className="absolute right-0.5 top-0.5 text-frost" />
                 )}
@@ -96,9 +101,15 @@ export function Heatmap({ weeks, weekdays, selected, onSelect, label, formatDay 
   );
 }
 
-type HeatLegendProps = { less: string; more: string; perfect: string; frozen: string };
+type HeatLegendProps = {
+  less: string;
+  more: string;
+  perfect: string;
+  frozen: string;
+  rest: string;
+};
 
-export function HeatLegend({ less, more, perfect, frozen }: HeatLegendProps) {
+export function HeatLegend({ less, more, perfect, frozen, rest }: HeatLegendProps) {
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted">
       <span className="flex items-center gap-1">
@@ -120,6 +131,10 @@ export function HeatLegend({ less, more, perfect, frozen }: HeatLegendProps) {
       <span className="flex items-center gap-1">
         <SnowflakeIcon size={12} className="text-frost" />
         {frozen}
+      </span>
+      <span className="flex items-center gap-1">
+        <CampfireIcon size={12} className="text-frost" />
+        {rest}
       </span>
     </div>
   );

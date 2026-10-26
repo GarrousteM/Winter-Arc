@@ -1,8 +1,10 @@
 import {
+  CampfireIcon,
   CaretLeftIcon,
   CaretRightIcon,
   DownloadSimpleIcon,
   UploadSimpleIcon,
+  XIcon,
 } from '@phosphor-icons/react';
 import { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -15,7 +17,7 @@ import {
   type Backup,
   type ImportError,
 } from '@/features/settings/backup';
-import { daysInclusive, isValidISODate, today } from '@/lib/dates';
+import { daysInclusive, formatLongDate, isValidISODate, today } from '@/lib/dates';
 import { Button, IconButton } from '@/ui/Button';
 import { Card } from '@/ui/Card';
 import { Field, TextInput } from '@/ui/Field';
@@ -131,6 +133,116 @@ function ArcSection() {
   );
 }
 
+const MAX_TRUCE_DAYS = 7;
+
+function TruceSection() {
+  const arc = useAppStore((s) => s.arc);
+  const restDays = useAppStore((s) => s.restDays);
+  const addRestDay = useAppStore((s) => s.addRestDay);
+  const removeRestDay = useAppStore((s) => s.removeRestDay);
+  const now = today();
+  const [date, setDate] = useState('');
+  const [error, setError] = useState<keyof typeof t.truceErrors | null>(null);
+  if (!arc) return null;
+
+  const minDate = now > arc.startDate ? now : arc.startDate;
+  const add = (day: string): boolean => {
+    if (day < now) return fail('past');
+    if (day < arc.startDate || day > arc.endDate) return fail('outside');
+    if (restDays.includes(day)) return true;
+    if (restDays.length >= MAX_TRUCE_DAYS) return fail('full');
+    addRestDay(day);
+    setError(null);
+    return true;
+  };
+  function fail(reason: keyof typeof t.truceErrors): false {
+    setError(reason);
+    return false;
+  }
+  // Trêve de Yule : 24, 25 et 26 décembre de l'Arc en cours.
+  const yuleYear = Number(arc.startDate.slice(0, 4));
+  const yule = [24, 25, 26].map((d) => `${yuleYear}-12-${d}`);
+  const yuleAvailable = yule.some((d) => d >= minDate && d <= arc.endDate && !restDays.includes(d));
+
+  return (
+    <section className="flex flex-col gap-3" aria-label={t.truceSection}>
+      <h2 className="eyebrow">{t.truceSection}</h2>
+      <Card className="flex flex-col gap-3">
+        <p className="m-0 text-sm text-muted">{t.truceHint}</p>
+        <div className="flex items-end gap-2">
+          <Field label={t.truceDate} className="flex-1">
+            {({ id }) => (
+              <TextInput
+                id={id}
+                type="date"
+                value={date}
+                min={minDate}
+                max={arc.endDate}
+                onChange={(e) => {
+                  setDate(e.target.value);
+                  setError(null);
+                }}
+              />
+            )}
+          </Field>
+          <Button
+            variant="secondary"
+            disabled={!isValidISODate(date)}
+            onClick={() => {
+              if (add(date)) setDate('');
+            }}
+          >
+            {t.truceAdd}
+          </Button>
+        </div>
+        {yuleAvailable && (
+          <Button
+            variant="ghost"
+            icon={<CampfireIcon size={18} />}
+            onClick={() => {
+              for (const day of yule) {
+                if (day >= minDate && day <= arc.endDate && !add(day)) break;
+              }
+            }}
+          >
+            {t.truceYule}
+          </Button>
+        )}
+        {error && <p className="m-0 text-sm text-warning">{t.truceErrors[error]}</p>}
+        <div className="flex items-center justify-between text-sm text-muted">
+          <span>{restDays.length === 0 ? t.truceEmpty : ''}</span>
+          <span className="numeric">{t.truceCount(restDays.length, MAX_TRUCE_DAYS)}</span>
+        </div>
+        {restDays.length > 0 && (
+          <ul className="m-0 flex list-none flex-col p-0">
+            {restDays.map((day) => (
+              <li
+                key={day}
+                className="flex min-h-touch items-center justify-between gap-2 border-b border-border"
+              >
+                <span className="flex items-center gap-2 text-sm">
+                  <CampfireIcon size={16} className="text-frost" />
+                  {formatLongDate(day)}
+                </span>
+                {day >= now && (
+                  <IconButton
+                    label={t.truceRemove(formatLongDate(day))}
+                    onClick={() => {
+                      removeRestDay(day);
+                    }}
+                  >
+                    <XIcon size={18} />
+                  </IconButton>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
+    </section>
+  );
+}
+
 function DataSection() {
   const replaceAll = useAppStore((s) => s.replaceAll);
   const resetAll = useAppStore((s) => s.resetAll);
@@ -143,9 +255,18 @@ function DataSection() {
   const [confirmStep, setConfirmStep] = useState(0);
 
   const exportData = async () => {
-    const { arc, categories, goals, checkIns, dayNotes, player, preferences } =
+    const { arc, categories, goals, checkIns, dayNotes, restDays, player, preferences } =
       useAppStore.getState();
-    const data: AppData = { arc, categories, goals, checkIns, dayNotes, player, preferences };
+    const data: AppData = {
+      arc,
+      categories,
+      goals,
+      checkIns,
+      dayNotes,
+      restDays,
+      player,
+      preferences,
+    };
     await saveFile(backupFileName(today()), JSON.stringify(buildBackup(data), null, 2));
     setStatus(t.exported);
   };
@@ -292,6 +413,8 @@ export function SettingsPage() {
       </header>
 
       <ArcSection />
+
+      <TruceSection />
 
       <section className="flex flex-col gap-3" aria-label={t.feedbackSection}>
         <h2 className="eyebrow">{t.feedbackSection}</h2>

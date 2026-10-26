@@ -1,12 +1,15 @@
 import type { PlayerState } from '@/lib/types';
 import type { BossId } from './bosses';
 import type { GameState } from './engine';
+import type { WeeklyRecap } from './retention';
 import { levelForXp, rankForLevel, type RankId } from './levels';
 
 // Différence entre la progression recalculée et ce qui a déjà été célébré. Fonctions pures.
 
 export type RewardEvent =
   | { kind: 'perfect' }
+  | { kind: 'return' }
+  | { kind: 'recap'; recap: WeeklyRecap }
   | { kind: 'badge'; badgeId: string }
   | { kind: 'boss'; bossId: BossId; index: number }
   | { kind: 'level'; level: number; rank: RankId; rankChanged: boolean };
@@ -43,6 +46,7 @@ export function diffRewards(
   return {
     events,
     next: {
+      ...seen,
       totalXp: Math.max(seen.totalXp, game.totalXp),
       unlockedBadges: [
         ...seen.unlockedBadges,

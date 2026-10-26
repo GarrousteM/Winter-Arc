@@ -19,9 +19,10 @@ function sampleData(): AppData {
   if (!pages) throw new Error('objectif manquant');
   s.setCheckIn(pages.id, '2026-11-02', 25);
   s.setDayNote('2026-11-02', 'Froid');
-  const { arc, categories, goals, checkIns, dayNotes, player, preferences } =
+  s.addRestDay('2026-12-24');
+  const { arc, categories, goals, checkIns, dayNotes, restDays, player, preferences } =
     useAppStore.getState();
-  return { arc, categories, goals, checkIns, dayNotes, player, preferences };
+  return { arc, categories, goals, checkIns, dayNotes, restDays, player, preferences };
 }
 
 describe('sauvegarde', () => {
@@ -55,5 +56,15 @@ describe('sauvegarde', () => {
 
   it('nomme le fichier avec la date', () => {
     expect(backupFileName('2026-11-03')).toBe('winter-arc-2026-11-03.json');
+  });
+});
+
+describe('sauvegarde antérieure aux trêves', () => {
+  it('accepte une sauvegarde du schéma 2 sans jours de trêve', () => {
+    const { restDays: _restDays, ...rest } = sampleData();
+    const result = parseBackup(
+      JSON.stringify({ ...buildBackup({ ...rest, restDays: [] }), schema: 2, data: rest }),
+    );
+    expect(result.ok && result.backup.data.restDays).toEqual([]);
   });
 });

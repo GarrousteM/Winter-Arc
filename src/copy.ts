@@ -21,6 +21,9 @@ export const copy = {
     legendMore: 'Plus',
     legendPerfect: 'Parfaite',
     legendFrozen: 'Joker',
+    legendRest: 'Trêve',
+    rest: 'Jour de trêve',
+    openRecap: 'Revoir le récap de la semaine',
     dayDetail: (percent: number, done: number, total: number) =>
       `${percent} % · ${done} / ${total} objectifs`,
     dayXp: (xp: number) => `+${xp} XP`,
@@ -72,6 +75,17 @@ export const copy = {
     dayPercent: (percent: number) => `${percent} % de la journée`,
     optional: (names: string) => `${names} : facultatif aujourd’hui (repos possible)`,
     tallyLabel: (day: number, total: number) => `Bâton de comptage : jour ${day} sur ${total}`,
+    milestonesLabel: 'Prochains paliers',
+    bossLeft: (name: string, shields: number, days: number) =>
+      `Encore ${shields} bouclier${shields > 1 ? 's' : ''} à briser pour vaincre ${name} · ${days} j`,
+    bossDefeated: (name: string) => `${name} est vaincu cette semaine`,
+    nextRank: (rank: string, xp: number) => `Plus que ${xp} XP avant ${rank}`,
+    nextLevel: (level: number, xp: number) => `Plus que ${xp} XP avant le niveau ${level}`,
+    jokerIn: (days: number) => `Prochain joker dans ${days} jour${days > 1 ? 's' : ''} de série`,
+    missing: (day: string, n: number) =>
+      `${day} : ${n} objectif${n > 1 ? 's' : ''} non saisi${n > 1 ? 's' : ''}`,
+    missingCta: 'Compléter',
+    truceDay: 'Jour de trêve : ta série est en pause, rien n’est perdu.',
     completedOf: (done: number, total: number) => `${done} / ${total}`,
     xpToday: (xp: number) => `+${xp} ce jour`,
     nothingToday: 'Aucun objectif prévu ce jour-là.',
@@ -136,6 +150,24 @@ export const copy = {
   },
   rewards: {
     tapToClose: 'Toucher pour continuer',
+    returnTitle: 'Le guerrier revient',
+    returnBody: 'Quelques jours sont passés. L’hiver n’est pas fini : voici ce qui t’attend.',
+    returnDaysLeft: (days: number) => `${days} jour${days > 1 ? 's' : ''} avant la fin de l’Arc`,
+    recapEyebrow: (week: number) => `Saga de la semaine ${week}`,
+    recapBossDefeated: (name: string) => `${name} vaincu`,
+    recapBossEscaped: (name: string) => `${name} s’est enfui`,
+    recapStrongDays: (n: number, total: number) => `${n} / ${total} jours à 80 %`,
+    recapPerfect: (n: number) => `${n} journée${n > 1 ? 's' : ''} parfaite${n > 1 ? 's' : ''}`,
+    recapXp: (xp: number) => `+${xp} XP`,
+    recapDelta: (delta: number) =>
+      delta > 0
+        ? `+${delta} XP par rapport à la semaine d’avant`
+        : delta < 0
+          ? `${delta} XP par rapport à la semaine d’avant`
+          : 'Autant d’XP que la semaine d’avant',
+    recapBestGoal: (title: string, done: number, total: number) =>
+      `Meilleur objectif : ${title} (${done}/${total})`,
+    recapStreak: (n: number) => `Série en cours : ${n} jour${n > 1 ? 's' : ''}`,
     levelUp: 'Niveau supérieur',
     level: (n: number) => `Niveau ${n}`,
     newRank: 'Nouveau rang',
@@ -356,6 +388,20 @@ export const copy = {
     arcSave: 'Enregistrer l’Arc',
     arcSaved: 'Arc enregistré',
     arcDatesHint: 'Changer les dates recalcule les jours, la série, les boss et l’XP.',
+    truceSection: 'Trêve',
+    truceHint:
+      'Déclare à l’avance quelques jours de pause (fêtes, voyage) : ta série et tes jokers sont protégés, et ces jours sortent des PV des boss et des taux de réussite.',
+    truceDate: 'Jour de trêve',
+    truceAdd: 'Ajouter',
+    truceYule: 'Trêve de Yule (24 au 26 décembre)',
+    truceRemove: (date: string) => `Retirer ${date}`,
+    truceCount: (n: number, max: number) => `${n} / ${max} jours`,
+    truceEmpty: 'Aucun jour de trêve déclaré.',
+    truceErrors: {
+      past: 'Une trêve se déclare à l’avance : aujourd’hui ou plus tard.',
+      outside: 'Ce jour est en dehors de l’Arc.',
+      full: 'Nombre maximal de jours de trêve atteint.',
+    },
     feedbackSection: 'Sons et vibrations',
     sound: 'Sons',
     soundHint: 'Coup sourd au check, cor au level-up, fracas au boss vaincu.',

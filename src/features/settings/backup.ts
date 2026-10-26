@@ -3,7 +3,7 @@ import type { AppData } from '@/app/store';
 // Export / import JSON de toutes les données (SPEC.md, « Modèle de données »). Fonctions pures.
 
 export const BACKUP_APP = 'winter-arc';
-export const BACKUP_SCHEMA = 2;
+export const BACKUP_SCHEMA = 3;
 
 export type Backup = {
   app: typeof BACKUP_APP;
@@ -82,6 +82,8 @@ function validData(d: unknown): d is AppData {
   if (!isObject(player) || !isNumber(player.totalXp) || !Array.isArray(player.unlockedBadges))
     return false;
   if (!isObject(preferences)) return false;
+  if (d.restDays !== undefined && !(Array.isArray(d.restDays) && d.restDays.every(isString)))
+    return false;
   return true;
 }
 
@@ -108,7 +110,8 @@ export function parseBackup(text: string): ImportResult {
       app: BACKUP_APP,
       schema: BACKUP_SCHEMA,
       exportedAt: isString(raw.exportedAt) ? raw.exportedAt : '',
-      data: { ...data, player },
+      // Une sauvegarde antérieure aux trêves (schéma 2) n'a pas de `restDays`.
+      data: { ...data, restDays: Array.isArray(data.restDays) ? data.restDays : [], player },
     },
   };
 }

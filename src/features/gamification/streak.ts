@@ -16,7 +16,8 @@ export function streakMultiplier(streak: number): number {
 
 export type StreakState = { streak: number; best: number; tokens: number };
 
-export type DayOutcome = 'success' | 'missed' | 'pending';
+/** `rest` : jour de trêve déclaré, la série reste en l'état comme pour la journée en cours. */
+export type DayOutcome = 'success' | 'missed' | 'pending' | 'rest';
 
 export type StreakStep = StreakState & {
   /** Un joker a été consommé pour sauver la série ce jour-là. */
@@ -30,7 +31,8 @@ export type StreakStep = StreakState & {
  * `pending` : journée en cours pas encore réussie, la série reste en l'état (rien n'est consommé).
  */
 export function stepStreak(state: StreakState, outcome: DayOutcome): StreakStep {
-  if (outcome === 'pending') return { ...state, frozen: false, earned: false };
+  if (outcome === 'pending' || outcome === 'rest')
+    return { ...state, frozen: false, earned: false };
   if (outcome === 'success') {
     const streak = state.streak + 1;
     const earned = streak % FREEZE_EVERY === 0 && state.tokens < FREEZE_MAX;

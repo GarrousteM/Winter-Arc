@@ -86,6 +86,14 @@ Direction « Saga gravée » (validée par Max après la phase 6) :
 44. **Boss gravé dans une pierre runique à bande-serpent** ; PV en **mur de 10 boucliers** (un bouclier entamé tient ; 8 à briser = 80 %). Nouveau rang dans une pierre à bande dorée.
 45. **Cartes clés en fer riveté** (`IronCard`, token `--color-iron` #4A5664, décor uniquement). Symboles nordiques récupérés par des groupes extrémistes (valknut, roue solaire, Othala à empattements, Wolfsangel) exclus.
 
+Rétention (demande de Max, à confirmer en revue) :
+
+46. **Prochains paliers** sur l'écran Aujourd'hui (jour en cours) : boucliers restant à briser et jours restants pour le boss, XP avant le prochain rang (ou niveau au rang maximal), jours de série avant le prochain joker.
+47. **Rattrapage** : bannière par jour encore rattrapable (J−1, J−2) ayant des objectifs qui comptent sans saisie, avec un bouton qui ouvre ce jour.
+48. **Écran de retour** (« Le guerrier revient ») : quand au moins un jour est sorti de la fenêtre de rattrapage sans saisie, une fois par absence (`PlayerState.lastWelcomeBack`) ; jours restants, boss, prochain rang ; aucune culpabilisation.
+49. **Trêve** : jusqu'à 7 jours (`restDays`, store v3, sauvegarde schéma 3), déclarés aujourd'hui ou plus tard, dans l'Arc ; raccourci « Trêve de Yule » (24–26 décembre). Un jour de trêve non réussi ne casse ni la série globale ni les séries par objectif, ne consomme pas de joker, sort des PV du boss, de la complétion globale et des taux ; il allège d'une séance le quota des hebdomadaires de sa semaine. Réussi, il compte normalement.
+50. **Récap hebdomadaire** (« Saga de la semaine ») : à la première ouverture après la fin d'une semaine de boss, une fois (`PlayerState.lastRecapWeek`) ; boss vaincu ou enfui, XP de la semaine et écart avec la précédente, jours à 80 %, journées parfaites, meilleur objectif, série. Revoir depuis Progression. Ordre d'affichage : retour, récap, puis récompenses. Ni retour ni récap pour la période antérieure à la création de l'Arc (Arc antidaté).
+
 ## Choix techniques
 
 - Tailwind 3.4 avec `tailwind.config.ts` ; `colors`, `fontFamily`, `borderRadius`, `borderWidth`, `boxShadow` définis dans `theme` (pas `extend`) pour supprimer les valeurs par défaut.

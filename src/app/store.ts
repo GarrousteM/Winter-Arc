@@ -37,6 +37,8 @@ export type AppData = {
   goals: Goal[];
   checkIns: CheckIn[];
   dayNotes: DayNote[];
+  /** Jours de trêve déclarés à l'avance (série en pause, rien n'est perdu). */
+  restDays: ISODate[];
   player: PlayerState;
   preferences: Preferences;
 };
@@ -58,6 +60,8 @@ type AppActions = {
   /** Enregistre une valeur (ou l'efface avec `undefined`) ; `completed` est recalculé. */
   setCheckIn: (goalId: string, date: string, value: number | undefined) => void;
   setDayNote: (date: string, text: string) => void;
+  addRestDay: (date: ISODate) => void;
+  removeRestDay: (date: ISODate) => void;
   /** Mémorise la progression déjà célébrée. */
   acknowledge: (player: PlayerState) => void;
   updatePreferences: (patch: Partial<Preferences>) => void;
@@ -74,6 +78,7 @@ export const initialData: AppData = {
   goals: [],
   checkIns: [],
   dayNotes: [],
+  restDays: [],
   player: { totalXp: 0, unlockedBadges: [], freezeTokens: 0, defeatedBosses: [] },
   preferences: { sound: true, vibration: true },
 };
@@ -265,6 +270,15 @@ export const useAppStore = create<AppState>()(
         set({ dayNotes: trimmed ? [...others, { date, text: trimmed }] : others });
       },
 
+      addRestDay: (date) => {
+        if (get().restDays.includes(date)) return;
+        set({ restDays: [...get().restDays, date].sort() });
+      },
+
+      removeRestDay: (date) => {
+        set({ restDays: get().restDays.filter((d) => d !== date) });
+      },
+
       acknowledge: (player) => {
         set({ player });
       },
@@ -283,12 +297,16 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'winter-arc',
-      version: 2,
+      version: 3,
       migrate: (persisted, version) => {
-        const data = persisted as AppData;
+        let data = persisted as AppData;
         // v1 → v2 : ajout de `player.defeatedBosses`.
         if (version < 2) {
-          return { ...data, player: { ...initialData.player, ...data.player, defeatedBosses: [] } };
+          data = { ...data, player: { ...initialData.player, ...data.player, defeatedBosses: [] } };
+        }
+        // v2 → v3 : ajout des jours de trêve.
+        if (version < 3) {
+          data = { ...data, restDays: [] };
         }
         return data;
       },
@@ -299,6 +317,7 @@ export const useAppStore = create<AppState>()(
         goals: state.goals,
         checkIns: state.checkIns,
         dayNotes: state.dayNotes,
+        restDays: state.restDays,
         player: state.player,
         preferences: state.preferences,
       }),

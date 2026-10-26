@@ -39,6 +39,7 @@ export function GoalDetailPage() {
   const goals = useAppStore((s) => s.goals);
   const categories = useAppStore((s) => s.categories);
   const checkIns = useAppStore((s) => s.checkIns);
+  const restDays = useAppStore((s) => s.restDays);
   const game = useGame();
   const [sheet, setSheet] = useState<GoalSheetTarget | null>(null);
   const [selected, setSelected] = useState<ISODate | undefined>(undefined);
@@ -51,7 +52,7 @@ export function GoalDetailPage() {
 
   const ctx: DayContext = { goals, categories, index: indexCheckIns(checkIns) };
   const until = now < arc.endDate ? now : arc.endDate;
-  const rate = goalRate(goal, arc.startDate, until, now, ctx);
+  const rate = goalRate(goal, arc.startDate, until, now, ctx, new Set(restDays));
   const streak = game.goalStreaks[goal.id];
   const unit = (n: number) => (streak?.unit === 'weeks' ? t.unitWeeks(n) : t.unitDays(n));
   const series = goalSeries(goal, arc.startDate, until, ctx);
@@ -72,6 +73,7 @@ export function GoalDetailPage() {
         level: !point || cell.date > now ? undefined : point.completed ? 4 : 0,
         perfect: false,
         frozen: false,
+        rest: restDays.includes(cell.date),
         today: cell.date === now,
         label,
       };

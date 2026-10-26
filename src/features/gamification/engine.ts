@@ -24,8 +24,10 @@ export type DayResult = {
   completed: number;
   ratio: number;
   perfect: boolean;
-  /** `pending` : jour en cours, pas encore à 80 %. */
-  outcome: 'success' | 'missed' | 'pending';
+  /** `pending` : jour en cours, pas encore à 80 % ; `rest` : jour de trêve non réussi. */
+  outcome: 'success' | 'missed' | 'pending' | 'rest';
+  /** Jour de trêve déclaré. */
+  rest: boolean;
   frozen: boolean;
   streak: number;
   multiplier: number;
@@ -72,6 +74,8 @@ export type GameInput = {
   checkIns: CheckIn[];
   today: ISODate;
   badges: { id: string; condition: (c: BadgeContext) => boolean }[];
+  /** Jours de trêve : ils ne cassent pas les séries et sortent des PV des boss. */
+  restDays?: ISODate[];
 };
 
 const minDate = (a: ISODate, b: ISODate) => (a < b ? a : b);
@@ -133,21 +137,25 @@ export function goalStreak(
   until: ISODate,
   today: ISODate,
   ctx: DayContext,
+  rest: ReadonlySet<ISODate> = new Set(),
 ): GoalStreak {
   let current = 0;
   let best = 0;
   if (goal.frequency.kind === 'weekly') {
-    const times = goal.frequency.timesPerWeek;
     for (let monday = weekStart(start); monday <= until; monday = addDaysISO(monday, 7)) {
       const sunday = addDaysISO(monday, 6);
       let done = 0;
       let appears = false;
+      let restDays = 0;
       for (const d of datesBetween(maxDate(monday, start), minDate(sunday, until))) {
+        if (rest.has(d)) restDays += 1;
         if (!appearsOn(goal, ctx.categories, d)) continue;
         appears = true;
         if (ctx.index.get(checkInKey(goal.id, d))?.completed) done += 1;
       }
       if (!appears) continue;
+      // Chaque jour de trêve de la semaine allège le quota d'une séance.
+      const times = Math.max(0, goal.frequency.timesPerWeek - restDays);
       if (done >= times) {
         current += 1;
         best = Math.max(best, current);
@@ -164,7 +172,7 @@ export function goalStreak(
     if (ctx.index.get(checkInKey(goal.id, d))?.completed) {
       current += 1;
       best = Math.max(best, current);
-    } else if (d !== today) {
+    } else if (d !== today && !rest.has(d)) {
       current = 0;
     }
   }
@@ -177,13 +185,17 @@ export function computeGame(input: GameInput): GameState {
   const until = minDate(today, arc.endDate);
   const totalDays = daysInclusive(arc.startDate, arc.endDate);
   const { prologue, weeks } = bossWeeks(arc.startDate, arc.endDate);
+  const rest = new Set(input.restDays ?? []);
 
   const bosses: BossWeek[] = weeks.map((w, index) => ({
     index,
     bossId: bossForWeek(index, weeks.length),
     start: w.start,
     end: w.end,
-    hp: weekMaxXp(datesBetween(w.start, w.end), ctx),
+    hp: weekMaxXp(
+      datesBetween(w.start, w.end).filter((d) => !rest.has(d)),
+      ctx,
+    ),
     damage: 0,
     defeatedOn: undefined,
     status: today > w.end ? 'escaped' : today >= w.start ? 'active' : 'upcoming',
@@ -213,7 +225,8 @@ export function computeGame(input: GameInput): GameState {
     const states = dayStates(date, ctx);
     const summary = summarizeDay(states);
     const reached = summary.counted === 0 || summary.ratio >= STREAK_THRESHOLD;
-    const outcome = reached ? 'success' : date === today ? 'pending' : 'missed';
+    const isRest = rest.has(date);
+    const outcome = reached ? 'success' : isRest ? 'rest' : date === today ? 'pending' : 'missed';
     const step = stepStreak(state, outcome);
     state = { streak: step.streak, best: step.best, tokens: step.tokens };
 
@@ -236,8 +249,11 @@ export function computeGame(input: GameInput): GameState {
     }
 
     if (summary.perfect) perfectDays += 1;
-    countedSum += summary.counted;
-    completedSum += summary.completed;
+    // Une trêve non réussie ne pèse pas sur la complétion globale.
+    if (outcome !== 'rest') {
+      countedSum += summary.counted;
+      completedSum += summary.completed;
+    }
     for (const c of checkIns) {
       if (c.date !== date) continue;
       checkInCount += 1;
@@ -249,7 +265,7 @@ export function computeGame(input: GameInput): GameState {
       if (screenStates.every((s) => s.completed)) {
         screenStreak += 1;
         bestScreenStreak = Math.max(bestScreenStreak, screenStreak);
-      } else if (date !== today) {
+      } else if (date !== today && !isRest) {
         screenStreak = 0;
       }
     }
@@ -261,6 +277,7 @@ export function computeGame(input: GameInput): GameState {
       ratio: summary.ratio,
       perfect: summary.perfect,
       outcome,
+      rest: isRest,
       frozen: step.frozen,
       streak: state.streak,
       multiplier,
@@ -289,7 +306,7 @@ export function computeGame(input: GameInput): GameState {
 
   const goalStreaks: Record<string, GoalStreak> = {};
   for (const goal of goals) {
-    goalStreaks[goal.id] = goalStreak(goal, arc.startDate, until, today, ctx);
+    goalStreaks[goal.id] = goalStreak(goal, arc.startDate, until, today, ctx, rest);
   }
 
   const level = levelForXp(totalXp);

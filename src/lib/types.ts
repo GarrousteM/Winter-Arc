@@ -85,6 +85,10 @@ export type PlayerState = {
   freezeTokens: number;
   /** Index des semaines dont le boss a déjà été célébré. */
   defeatedBosses: number[];
+  /** Dernier affichage de l'écran de retour après une absence. */
+  lastWelcomeBack?: ISODate;
+  /** Lundi de la dernière semaine dont le récap a été affiché. */
+  lastRecapWeek?: ISODate;
 };
 
 export type Preferences = {
