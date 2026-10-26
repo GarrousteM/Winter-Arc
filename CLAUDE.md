@@ -94,6 +94,10 @@ Rétention (demande de Max, à confirmer en revue) :
 49. **Trêve** : jusqu'à 7 jours (`restDays`, store v3, sauvegarde schéma 3), déclarés aujourd'hui ou plus tard, dans l'Arc ; raccourci « Trêve de Yule » (24–26 décembre). Un jour de trêve non réussi ne casse ni la série globale ni les séries par objectif, ne consomme pas de joker, sort des PV du boss, de la complétion globale et des taux ; il allège d'une séance le quota des hebdomadaires de sa semaine. Réussi, il compte normalement.
 50. **Récap hebdomadaire** (« Saga de la semaine ») : à la première ouverture après la fin d'une semaine de boss, une fois (`PlayerState.lastRecapWeek`) ; boss vaincu ou enfui, XP de la semaine et écart avec la précédente, jours à 80 %, journées parfaites, meilleur objectif, série. Écart d'XP affiché seulement s’il est positif, série seulement si elle est en cours. Revoir depuis Progression. Ordre d'affichage : retour, récap, puis récompenses. Ni retour ni récap pour la période antérieure à la création de l'Arc (Arc antidaté).
 
+Illustrations (validées par Max) :
+
+51. **Bestiaire gravé** : chaque boss a sa gravure SVG (`src/features/gamification/bossArt.tsx`, composant `BossEngraving`) : trait en glace, hachures en acier des fjords, or réservé aux yeux et à un détail (cœur de Hrungnir, soleil de Sköll). Vaincu : gravure éteinte (niveaux de gris) barrée d'une entaille d'or. Affichée dans la pierre du boss (Trophées), l'écran « Boss vaincu » et le récap hebdo. Les quatre loups ont chacun leur pose (Fenrir de face enchaîné, Garm assis devant la porte de Hel, Sköll en course vers le soleil, Hati hurlant à la lune).
+
 ## Choix techniques
 
 - Tailwind 3.4 avec `tailwind.config.ts` ; `colors`, `fontFamily`, `borderRadius`, `borderWidth`, `boxShadow` définis dans `theme` (pas `extend`) pour supprimer les valeurs par défaut.

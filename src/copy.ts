@@ -507,6 +507,7 @@ export const copy = {
       limit: 'Objectif limite',
     },
     viking: {
+      bestiary: 'Bestiaire gravé (le premier, vaincu)',
       shield: 'Bouclier du jour : le bord en or se remplit, le compte sur la bosse',
       tally: 'Bâton de comptage (une encoche par jour)',
       ironCard: 'Carte en fer riveté',
@@ -524,7 +525,6 @@ export const copy = {
       snow: 'Neige fine (désactivée si mouvement réduit)',
     },
     rewards: {
-      boss: 'Placeholder de boss',
       badges: 'Badges : pierre runique et bouclier',
       unlocked: 'Débloqué',
       locked: 'Verrouillé',
