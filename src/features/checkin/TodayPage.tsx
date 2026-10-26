@@ -17,6 +17,7 @@ import { dayNumber, formatLongDate, today } from '@/lib/dates';
 import { vibrate } from '@/lib/haptics';
 import { playShieldThud } from '@/lib/sound';
 import type { ISODate } from '@/lib/types';
+import { FjordHorizon } from '@/ui/FjordHorizon';
 import { Button } from '@/ui/Button';
 import { CategoryMarker } from '@/ui/CategoryMarker';
 import { DayShield } from '@/ui/DayShield';
@@ -291,6 +292,9 @@ export function TodayPage() {
       })}
 
       <DayNoteField key={date} date={date} />
+
+      {/* Point final de la journée : petit fjord, visible seulement en bas de la liste. */}
+      <FjordHorizon band className="-mx-4 -mb-8 mt-2 block w-[calc(100%+2rem)]" />
     </div>
   );
 }

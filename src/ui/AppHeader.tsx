@@ -1,6 +1,7 @@
 import { GearSixIcon } from '@phosphor-icons/react';
 import { copy } from '@/copy';
 import { IconButton } from './Button';
+import { Drakkar } from './FjordHorizon';
 import { TallyStick } from './TallyStick';
 
 type AppHeaderProps = {
@@ -40,11 +41,20 @@ export function AppHeader({ day, totalDays, onSettings }: AppHeaderProps) {
           <GearSixIcon size={24} />
         </IconButton>
       </div>
-      <TallyStick
-        done={before ? 0 : shown}
-        total={totalDays}
-        label={copy.today.tallyLabel(before ? 0 : shown, totalDays)}
-      />
+      <div className="relative mt-3">
+        <TallyStick
+          done={before ? 0 : shown}
+          total={totalDays}
+          label={copy.today.tallyLabel(before ? 0 : shown, totalDays)}
+        />
+        {/* Le drakkar navigue sur le bâton : posé sur le jour en cours. */}
+        <div
+          className="pointer-events-none absolute bottom-[10px] -translate-x-1/2"
+          style={{ left: `${((before ? 0 : shown - 0.5) / Math.max(1, totalDays)) * 100}%` }}
+        >
+          <Drakkar size={30} />
+        </div>
+      </div>
     </header>
   );
 }
