@@ -281,10 +281,8 @@ function RecapContent({ recap }: { recap: WeeklyRecap }) {
       <Reveal delay={0.7}>
         <div className="flex flex-col items-center gap-1">
           <span className="numeric text-5xl text-accent">{r.recapXp(recap.xp)}</span>
-          {recap.xpDelta !== undefined && (
-            <span className={recap.xpDelta > 0 ? 'text-sm text-success' : 'text-sm text-muted'}>
-              {r.recapDelta(recap.xpDelta)}
-            </span>
+          {recap.xpDelta !== undefined && recap.xpDelta > 0 && (
+            <span className="text-sm text-success">{r.recapDelta(recap.xpDelta)}</span>
           )}
         </div>
       </Reveal>
@@ -297,7 +295,7 @@ function RecapContent({ recap }: { recap: WeeklyRecap }) {
               {r.recapBestGoal(recap.bestGoal.title, recap.bestGoal.done, recap.bestGoal.total)}
             </li>
           )}
-          <li className="text-frost">{r.recapStreak(recap.streak)}</li>
+          {recap.streak > 0 && <li className="text-frost">{r.recapStreak(recap.streak)}</li>}
         </ul>
       </Reveal>
     </>
