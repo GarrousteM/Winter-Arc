@@ -12,6 +12,16 @@ import { RuneStone } from '@/ui/RuneStone';
 import { futhark } from '@/ui/runes';
 import { badges } from './badges';
 import { useRewardQueue } from './rewardQueue';
+import { indexCheckIns } from '@/features/checkin/dayModel';
+import { dayNumber, toISODate, today } from '@/lib/dates';
+import {
+  lastActiveDay,
+  milestones,
+  shouldShowRecap,
+  shouldWelcomeBack,
+  weeklyRecap,
+  type WeeklyRecap,
+} from './retention';
 import { diffRewards, type RewardEvent } from './rewards';
 import { useGame } from './useGame';
 import { BOSS_BONUS, PERFECT_DAY_BONUS } from './xp';
@@ -24,6 +34,10 @@ const r = copy.rewards;
  */
 export function RewardHost() {
   const game = useGame();
+  const arc = useAppStore((s) => s.arc);
+  const goals = useAppStore((s) => s.goals);
+  const categories = useAppStore((s) => s.categories);
+  const checkIns = useAppStore((s) => s.checkIns);
   const seen = useAppStore((s) => s.player);
   const acknowledge = useAppStore((s) => s.acknowledge);
   const push = useRewardQueue((s) => s.push);
@@ -31,11 +45,35 @@ export function RewardHost() {
   const next = useRewardQueue((s) => s.next);
 
   useEffect(() => {
-    if (!game) return;
+    if (!game || !arc) return;
+    const now = today();
+    // Jour de création de l'Arc : rien d'antérieur (Arc antidaté) ne déclenche retour ni récap.
+    const createdOn = toISODate(new Date(arc.createdAt));
+    const since = createdOn > arc.startDate ? createdOn : arc.startDate;
     const { events, next: nextSeen } = diffRewards(seen, game);
-    if (events.length > 0) push(...events);
+    // Écrans d'information d'abord (retour après absence, récap de la semaine), puis les récompenses.
+    const info: RewardEvent[] = [];
+    const lastActive = lastActiveDay(checkIns);
+    if (
+      shouldWelcomeBack({
+        today: now,
+        startDate: since,
+        endDate: arc.endDate,
+        lastActive,
+        lastShown: seen.lastWelcomeBack,
+      })
+    ) {
+      info.push({ kind: 'return' });
+      nextSeen.lastWelcomeBack = now;
+    }
+    const recap = weeklyRecap(game, now, { goals, categories, index: indexCheckIns(checkIns) });
+    if (recap && shouldShowRecap(recap, seen.lastRecapWeek, createdOn)) {
+      info.push({ kind: 'recap', recap });
+      nextSeen.lastRecapWeek = recap.start;
+    }
+    if (info.length + events.length > 0) push(...info, ...events);
     if (JSON.stringify(nextSeen) !== JSON.stringify(seen)) acknowledge(nextSeen);
-  }, [game, seen, push, acknowledge]);
+  }, [game, arc, goals, categories, checkIns, seen, push, acknowledge]);
 
   return (
     <AnimatePresence mode="wait">
@@ -67,11 +105,19 @@ function label(event: RewardEvent): string {
       return `${r.boss} : ${copy.bosses[event.bossId].name}`;
     case 'level':
       return `${r.level(event.level)} · ${copy.ranks[event.rank]}`;
+    case 'return':
+      return r.returnTitle;
+    case 'recap':
+      return r.recapEyebrow(event.recap.index + 1);
   }
 }
 
 function RewardContent({ event }: { event: RewardEvent }) {
   switch (event.kind) {
+    case 'return':
+      return <ReturnContent />;
+    case 'recap':
+      return <RecapContent recap={event.recap} />;
     case 'perfect':
       return (
         <>
@@ -180,6 +226,84 @@ function RewardContent({ event }: { event: RewardEvent }) {
   }
 }
 
+function ReturnContent() {
+  const game = useGame();
+  const arc = useAppStore((s) => s.arc);
+  if (!game || !arc) return null;
+  const now = today();
+  const m = milestones(game, now);
+  const daysLeft = dayNumber(now, arc.endDate);
+  return (
+    <>
+      <RuneRow lit />
+      <Reveal delay={0.4}>
+        <h2 className="text-3xl font-black text-accent">{r.returnTitle}</h2>
+      </Reveal>
+      <Reveal delay={0.7}>
+        <p className="m-0 max-w-xs text-muted">{r.returnBody}</p>
+      </Reveal>
+      <Reveal delay={1}>
+        <ul className="m-0 flex list-none flex-col gap-2 p-0 text-sm">
+          <li className="numeric text-2xl text-text">{r.returnDaysLeft(daysLeft)}</li>
+          {m.boss && !m.boss.defeated && (
+            <li>
+              {copy.today.bossLeft(
+                copy.bosses[m.boss.bossId].name,
+                m.boss.toBreak,
+                m.boss.daysLeft,
+              )}
+            </li>
+          )}
+          <li>
+            {m.next.kind === 'rank'
+              ? copy.today.nextRank(copy.ranks[m.next.rank], m.next.xp)
+              : copy.today.nextLevel(m.next.level, m.next.xp)}
+          </li>
+        </ul>
+      </Reveal>
+    </>
+  );
+}
+
+function RecapContent({ recap }: { recap: WeeklyRecap }) {
+  const boss = copy.bosses[recap.bossId].name;
+  return (
+    <>
+      <span className="eyebrow text-accent">{r.recapEyebrow(recap.index + 1)}</span>
+      <Reveal delay={0.2}>
+        <BossSilhouette defeated={recap.defeated} size={110} />
+      </Reveal>
+      <Reveal delay={0.4}>
+        <h2 className={recap.defeated ? 'text-3xl font-black text-accent' : 'text-3xl font-black'}>
+          {recap.defeated ? r.recapBossDefeated(boss) : r.recapBossEscaped(boss)}
+        </h2>
+      </Reveal>
+      <Reveal delay={0.7}>
+        <div className="flex flex-col items-center gap-1">
+          <span className="numeric text-5xl text-accent">{r.recapXp(recap.xp)}</span>
+          {recap.xpDelta !== undefined && (
+            <span className={recap.xpDelta > 0 ? 'text-sm text-success' : 'text-sm text-muted'}>
+              {r.recapDelta(recap.xpDelta)}
+            </span>
+          )}
+        </div>
+      </Reveal>
+      <Reveal delay={1}>
+        <ul className="m-0 flex list-none flex-col gap-1 p-0 text-sm text-muted">
+          <li>{r.recapStrongDays(recap.strongDays, recap.days)}</li>
+          {recap.perfectDays > 0 && <li>{r.recapPerfect(recap.perfectDays)}</li>}
+          {recap.bestGoal && (
+            <li>
+              {r.recapBestGoal(recap.bestGoal.title, recap.bestGoal.done, recap.bestGoal.total)}
+            </li>
+          )}
+          <li className="text-frost">{r.recapStreak(recap.streak)}</li>
+        </ul>
+      </Reveal>
+    </>
+  );
+}
+
 /** Écran plein de récompense : fermeture par tap ou Échap. */
 function RewardOverlay({ event, onClose }: { event: RewardEvent; onClose: () => void }) {
   const ref = useRef<HTMLButtonElement>(null);
@@ -189,7 +313,7 @@ function RewardOverlay({ event, onClose }: { event: RewardEvent; onClose: () => 
     if (event.kind === 'level') playWarHorn(true);
     else if (event.kind === 'perfect') playWarHorn(false);
     else if (event.kind === 'boss') playCrash();
-    else playShieldThud();
+    else if (event.kind === 'badge') playShieldThud();
   }, [event, soundOn]);
   useEffect(() => {
     ref.current?.focus();

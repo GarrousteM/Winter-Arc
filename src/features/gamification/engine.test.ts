@@ -249,3 +249,65 @@ describe('badges', () => {
     expect(g.level).toBeGreaterThanOrEqual(20);
   });
 });
+
+describe('trêve', () => {
+  const restGame = (checkIns: CheckIn[], today: string, restDays: string[]) =>
+    computeGame({ arc, goals: [sugar], categories: [category], checkIns, today, badges, restDays });
+
+  it('ne casse pas la série ni ne consomme de joker sur un jour de trêve raté', () => {
+    const dates = [...range('2026-11-02', 7), '2026-11-10'];
+    const g = restGame(done('sugar', dates), '2026-11-10', ['2026-11-09']);
+    expect(g.days[7]).toMatchObject({
+      date: '2026-11-09',
+      outcome: 'rest',
+      rest: true,
+      frozen: false,
+      streak: 7,
+    });
+    expect(g.streak).toBe(8);
+    expect(g.freezeTokens).toBe(1);
+  });
+
+  it('compte une trêve réussie comme un jour normal', () => {
+    const g = restGame(done('sugar', range('2026-11-02', 3)), '2026-11-04', ['2026-11-03']);
+    expect(g.days[1]).toMatchObject({ outcome: 'success', rest: true });
+    expect(g.streak).toBe(3);
+  });
+
+  it('retire les jours de trêve des PV du boss et de la complétion globale', () => {
+    const g = restGame(done('sugar', range('2026-11-02', 5)), '2026-11-09', [
+      '2026-11-07',
+      '2026-11-08',
+    ]);
+    expect(g.bosses[0]?.hp).toBe(5 * 70);
+    expect(g.overallCompletion).toBe(5 / 6);
+  });
+
+  it('allège le quota hebdomadaire et protège les séries par objectif', () => {
+    const workout = goal({
+      id: 'workout',
+      type: 'boolean',
+      frequency: { kind: 'weekly', timesPerWeek: 3 },
+    });
+    const checks = done('workout', ['2026-11-02', '2026-11-03']);
+    const ctx = { goals: [workout], categories: [category], index: indexCheckIns(checks) };
+    expect(
+      goalStreak(workout, '2026-11-02', '2026-11-10', '2026-11-10', ctx, new Set(['2026-11-08'])),
+    ).toEqual({
+      current: 1,
+      best: 1,
+      unit: 'weeks',
+    });
+    const daily = indexCheckIns(done('sugar', ['2026-11-02', '2026-11-04']));
+    expect(
+      goalStreak(
+        sugar,
+        '2026-11-02',
+        '2026-11-05',
+        '2026-11-05',
+        { ...ctx, goals: [sugar], index: daily },
+        new Set(['2026-11-03']),
+      ),
+    ).toEqual({ current: 2, best: 2, unit: 'days' });
+  });
+});

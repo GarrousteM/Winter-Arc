@@ -10,9 +10,13 @@ export function useGame(): GameState | undefined {
   const goals = useAppStore((s) => s.goals);
   const categories = useAppStore((s) => s.categories);
   const checkIns = useAppStore((s) => s.checkIns);
+  const restDays = useAppStore((s) => s.restDays);
   const now = today();
   return useMemo(
-    () => (arc ? computeGame({ arc, goals, categories, checkIns, today: now, badges }) : undefined),
-    [arc, goals, categories, checkIns, now],
+    () =>
+      arc
+        ? computeGame({ arc, goals, categories, checkIns, today: now, badges, restDays })
+        : undefined,
+    [arc, goals, categories, checkIns, now, restDays],
   );
 }

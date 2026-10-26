@@ -141,3 +141,20 @@ describe('heatmap', () => {
     expect(weeks[13]?.[6]).toEqual({ date: '2027-01-31', inArc: true });
   });
 });
+
+describe('trêve dans les taux', () => {
+  it('ne compte pas un jour de trêve raté', () => {
+    const ctx = ctxOf([sugar], [check('sugar', '2026-11-02')]);
+    const rest = new Set(['2026-11-03']);
+    expect(goalRate(sugar, '2026-11-02', '2026-11-03', '2026-11-05', ctx, rest)).toEqual({
+      done: 1,
+      total: 1,
+      ratio: 1,
+    });
+    expect(categoryRate('c', '2026-11-02', '2026-11-03', '2026-11-05', ctx, rest)).toEqual({
+      done: 1,
+      total: 1,
+      ratio: 1,
+    });
+  });
+});

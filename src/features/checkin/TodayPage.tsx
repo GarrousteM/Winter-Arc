@@ -1,15 +1,23 @@
 import { useState } from 'react';
 import { useAppStore } from '@/app/store';
 import { copy } from '@/copy';
-import { FireIcon, SnowflakeIcon } from '@phosphor-icons/react';
+import {
+  CampfireIcon,
+  FireIcon,
+  ShieldStarIcon,
+  SnowflakeIcon,
+  SwordIcon,
+} from '@phosphor-icons/react';
 import { levelProgress, rankForLevel } from '@/features/gamification/levels';
 import { useRewardQueue } from '@/features/gamification/rewardQueue';
+import { milestones, missingEntries } from '@/features/gamification/retention';
 import { useGame } from '@/features/gamification/useGame';
 import { iconFor } from '@/features/goals/categoryIcons';
 import { dayNumber, formatLongDate, today } from '@/lib/dates';
 import { vibrate } from '@/lib/haptics';
 import { playShieldThud } from '@/lib/sound';
 import type { ISODate } from '@/lib/types';
+import { Button } from '@/ui/Button';
 import { CategoryMarker } from '@/ui/CategoryMarker';
 import { DayShield } from '@/ui/DayShield';
 import { RuneRow } from '@/ui/Rune';
@@ -28,6 +36,7 @@ export function TodayPage() {
   const goals = useAppStore((s) => s.goals);
   const categories = useAppStore((s) => s.categories);
   const checkIns = useAppStore((s) => s.checkIns);
+  const restDays = useAppStore((s) => s.restDays);
   const vibrationOn = useAppStore((s) => s.preferences.vibration);
   const soundOn = useAppStore((s) => s.preferences.sound);
   const setCheckIn = useAppStore((s) => s.setCheckIn);
@@ -93,6 +102,16 @@ export function TodayPage() {
 
   const activeCategories = categories.filter((c) => !c.archived).sort((a, b) => a.order - b.order);
   const percent = Math.round(summary.ratio * 100);
+  const isTruce = restDays.includes(date);
+  const next = game ? milestones(game, now) : undefined;
+  // Jours encore rattrapables avec des objectifs non saisis (seulement depuis l'onglet Aujourd'hui).
+  const missing =
+    date === now
+      ? days
+          .filter((d) => d < now)
+          .map((d) => ({ day: d, count: missingEntries(d, ctx) }))
+          .filter((m) => m.count > 0)
+      : [];
   // Objectifs affichés mais facultatifs aujourd'hui (hebdomadaire en jour de repos).
   const optionalNames = states
     .filter((s) => !s.counts)
@@ -112,6 +131,27 @@ export function TodayPage() {
           }))}
         />
       )}
+
+      {missing.map(({ day, count }) => (
+        <div
+          key={day}
+          role="status"
+          className="flex items-center justify-between gap-3 rounded border border-warning px-3 py-2"
+        >
+          <span className="text-sm">
+            {t.missing(t.dayLabels[dayNumber(day, now) - 1] ?? formatLongDate(day), count)}
+          </span>
+          <Button
+            variant="secondary"
+            className="shrink-0 px-3"
+            onClick={() => {
+              setSelected(day);
+            }}
+          >
+            {t.missingCta}
+          </Button>
+        </div>
+      ))}
 
       <section aria-label={t.progressLabel} className="flex flex-col items-center gap-3">
         <DayShield
@@ -169,6 +209,49 @@ export function TodayPage() {
         )}
       </div>
       {dayResult?.frozen && <p className="m-0 text-sm text-frost">{copy.streak.frozenNote}</p>}
+
+      {isTruce && (
+        <p className="m-0 flex items-center gap-2 text-sm text-frost">
+          <CampfireIcon size={18} />
+          {t.truceDay}
+        </p>
+      )}
+
+      {date === now && next && (
+        <ul
+          aria-label={t.milestonesLabel}
+          className="m-0 flex list-none flex-col gap-2 p-0 text-sm"
+        >
+          {next.boss && (
+            <li className="flex items-center gap-2">
+              <SwordIcon size={16} className="shrink-0 text-accent" />
+              <span className={next.boss.defeated ? 'text-success' : 'text-text'}>
+                {next.boss.defeated
+                  ? t.bossDefeated(copy.bosses[next.boss.bossId].name)
+                  : t.bossLeft(
+                      copy.bosses[next.boss.bossId].name,
+                      next.boss.toBreak,
+                      next.boss.daysLeft,
+                    )}
+              </span>
+            </li>
+          )}
+          <li className="flex items-center gap-2">
+            <ShieldStarIcon size={16} className="shrink-0 text-accent" />
+            <span>
+              {next.next.kind === 'rank'
+                ? t.nextRank(copy.ranks[next.next.rank], next.next.xp)
+                : t.nextLevel(next.next.level, next.next.xp)}
+            </span>
+          </li>
+          {next.jokerIn !== undefined && (
+            <li className="flex items-center gap-2 text-muted">
+              <SnowflakeIcon size={16} className="shrink-0 text-frost" />
+              <span>{t.jokerIn(next.jokerIn)}</span>
+            </li>
+          )}
+        </ul>
+      )}
 
       {states.length === 0 && <p className="m-0 text-muted">{t.nothingToday}</p>}
 

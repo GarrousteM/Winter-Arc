@@ -1,10 +1,13 @@
-import { CaretRightIcon } from '@phosphor-icons/react';
+import { CaretRightIcon, ScrollIcon } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppStore } from '@/app/store';
 import { copy } from '@/copy';
 import { indexCheckIns, type DayContext } from '@/features/checkin/dayModel';
 import { useGame } from '@/features/gamification/useGame';
+import { useRewardQueue } from '@/features/gamification/rewardQueue';
+import { weeklyRecap } from '@/features/gamification/retention';
+import { Button } from '@/ui/Button';
 import { iconFor } from '@/features/goals/categoryIcons';
 import { addDaysISO, formatWeekdayDate, today } from '@/lib/dates';
 import type { ISODate } from '@/lib/types';
@@ -23,6 +26,8 @@ export function ProgressPage() {
   const goals = useAppStore((s) => s.goals);
   const categories = useAppStore((s) => s.categories);
   const checkIns = useAppStore((s) => s.checkIns);
+  const restDays = useAppStore((s) => s.restDays);
+  const pushReward = useRewardQueue((s) => s.push);
   const game = useGame();
   const now = today();
   const [selected, setSelected] = useState<ISODate | undefined>(undefined);
@@ -33,6 +38,8 @@ export function ProgressPage() {
   const until = now < arc.endDate ? now : arc.endDate;
   const started = until >= arc.startDate;
   const byDate = new Map(game.days.map((d) => [d.date, d]));
+  const rest = new Set(restDays);
+  const recap = weeklyRecap(game, now, ctx);
 
   const weeks: HeatCell[][] = calendarWeeks(arc.startDate, arc.endDate).map((week) =>
     week.map((cell) => {
@@ -45,12 +52,14 @@ export function ProgressPage() {
       else if (day) parts.push(t.dayDetail(percent, day.completed, day.counted));
       if (day?.perfect) parts.push(t.perfect);
       if (day?.frozen) parts.push(t.frozen);
+      if (rest.has(cell.date)) parts.push(t.rest);
       return {
         date: cell.date,
         inArc: cell.inArc,
         level,
         perfect: day?.perfect ?? false,
         frozen: day?.frozen ?? false,
+        rest: rest.has(cell.date),
         today: cell.date === now,
         label: parts.join(', '),
       };
@@ -86,6 +95,7 @@ export function ProgressPage() {
           more={t.legendMore}
           perfect={t.legendPerfect}
           frozen={t.legendFrozen}
+          rest={t.legendRest}
         />
         <Card
           variant="raised"
@@ -121,11 +131,23 @@ export function ProgressPage() {
         </Card>
       </section>
 
+      {recap && (
+        <Button
+          variant="secondary"
+          icon={<ScrollIcon size={18} />}
+          onClick={() => {
+            pushReward({ kind: 'recap', recap });
+          }}
+        >
+          {t.openRecap}
+        </Button>
+      )}
+
       <section className="flex flex-col gap-3" aria-label={t.categories}>
         <h2 className="eyebrow">{t.categories}</h2>
         {activeCategories.map((category) => {
-          const recent = categoryRate(category.id, recentFrom, until, now, ctx);
-          const whole = categoryRate(category.id, arc.startDate, until, now, ctx);
+          const recent = categoryRate(category.id, recentFrom, until, now, ctx, rest);
+          const whole = categoryRate(category.id, arc.startDate, until, now, ctx, rest);
           return (
             <Card
               key={category.id}
@@ -164,7 +186,7 @@ export function ProgressPage() {
             .filter((g) => g.categoryId === category.id && g.status !== 'archived')
             .sort((a, b) => a.order - b.order)
             .map((goal) => {
-              const r = goalRate(goal, arc.startDate, until, now, ctx);
+              const r = goalRate(goal, arc.startDate, until, now, ctx, rest);
               const streak = game.goalStreaks[goal.id];
               return (
                 <Link

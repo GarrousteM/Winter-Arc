@@ -41,3 +41,12 @@ const RANKS: { from: number; id: RankId }[] = [
 export function rankForLevel(level: number): RankId {
   return RANKS.find((r) => level >= r.from)?.id ?? 'thrall';
 }
+
+/** Premier niveau du rang suivant, ou `undefined` au rang maximal. */
+export function nextRankLevel(level: number): number | undefined {
+  const current = rankForLevel(level);
+  for (let l = level + 1; l <= 25; l += 1) {
+    if (rankForLevel(l) !== current) return l;
+  }
+  return undefined;
+}
