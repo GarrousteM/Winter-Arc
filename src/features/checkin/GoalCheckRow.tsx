@@ -3,7 +3,6 @@ import { copy } from '@/copy';
 import { formatNumber, goalSummary } from '@/features/goals/summary';
 import { cn } from '@/lib/cn';
 import { durations, easeHeavy } from '@/lib/motion';
-import { Card } from '@/ui/Card';
 import { CheckToggle } from '@/ui/CheckToggle';
 import { ProgressBar } from '@/ui/ProgressBar';
 import { Stepper } from '@/ui/Stepper';
@@ -74,7 +73,7 @@ export function GoalCheckRow({
 
   if (goal.type === 'boolean') {
     return (
-      <Card accentToken={colorToken} className="relative flex items-center gap-3 py-2">
+      <div className="relative flex min-h-14 items-center gap-3 border-b border-surface-raised py-1">
         <div className="flex min-w-0 flex-1 flex-col">
           <span className={cn('font-medium', completed && 'text-muted line-through')}>
             {goal.title}
@@ -94,14 +93,14 @@ export function GoalCheckRow({
           }}
         />
         <XpGain gain={gain} onDone={onGainShown} />
-      </Card>
+      </div>
     );
   }
 
   const ratio = value !== undefined && target ? value / target : 0;
   const over = goal.type === 'limit' && value !== undefined && !completed;
   return (
-    <Card accentToken={colorToken} className="relative flex flex-col gap-2 py-3">
+    <div className="relative flex flex-col gap-2 border-b border-surface-raised py-2">
       <div className="flex items-center gap-3">
         <div className="flex min-w-0 flex-1 flex-col">
           <span className="font-medium">{goal.title}</span>
@@ -122,11 +121,12 @@ export function GoalCheckRow({
         />
       </div>
       <ProgressBar
+        thin
         value={ratio}
         label={goal.title}
         colorToken={over ? '--color-warning' : completed ? '--color-success' : colorToken}
       />
       <XpGain gain={gain} onDone={onGainShown} />
-    </Card>
+    </div>
   );
 }

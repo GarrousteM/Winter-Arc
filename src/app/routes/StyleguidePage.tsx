@@ -34,6 +34,11 @@ import { futhark } from '@/ui/runes';
 import { SnowField } from '@/ui/SnowField';
 import { Stepper } from '@/ui/Stepper';
 import { XpBar } from '@/ui/XpBar';
+import { BossStone } from '@/ui/BossPlaceholder';
+import { DayShield } from '@/ui/DayShield';
+import { IronCard } from '@/ui/IronCard';
+import { ShieldWall } from '@/ui/ShieldWall';
+import { TallyStick } from '@/ui/TallyStick';
 import { Field, TextInput } from '@/ui/Field';
 import { Segmented, ToggleChip } from '@/ui/Segmented';
 import { Sheet } from '@/ui/Sheet';
@@ -51,6 +56,7 @@ const baseTokens = [
   { token: '--color-frost', name: 'Glace' },
   { token: '--color-frost-deep', name: 'Acier des fjords' },
   { token: '--color-sky', name: 'Ciel polaire' },
+  { token: '--color-iron', name: 'Fer' },
   { token: '--color-success', name: 'Aurore verte' },
   { token: '--color-warning', name: 'Torche' },
 ];
@@ -153,7 +159,7 @@ function ContrastTable({ values }: { values: Record<string, string> }) {
     ...baseTokens.filter(
       (t) =>
         !backgrounds.some((b) => b.token === t.token) &&
-        !['--color-border', '--color-frost-deep', '--color-sky'].includes(t.token),
+        !['--color-border', '--color-frost-deep', '--color-sky', '--color-iron'].includes(t.token),
     ),
     ...categoryTokens,
   ];
@@ -501,6 +507,50 @@ export function StyleguidePage() {
           </div>
           <p className="text-sm text-muted">{sg.ornaments.grain}</p>
           <p className="text-sm text-muted">{sg.ornaments.snow}</p>
+        </Section>
+
+        <Section title={sg.sections.viking}>
+          <div className="flex flex-col items-center gap-2">
+            <span className="eyebrow self-start">{sg.viking.shield}</span>
+            <DayShield
+              planks={[
+                { key: 'a', colorToken: '--cat-1', done: false },
+                { key: 'b', colorToken: '--cat-1', done: true },
+                { key: 'c', colorToken: '--cat-2', done: true },
+                { key: 'd', colorToken: '--cat-2', done: true },
+                { key: 'e', colorToken: '--cat-3', done: true },
+                { key: 'f', colorToken: '--cat-4', done: false },
+              ]}
+              center="67"
+              label={copy.today.shieldLabel(4, 6, 67)}
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <span className="eyebrow">{sg.viking.tally}</span>
+            <TallyStick done={23} total={92} label={copy.today.tallyLabel(23, 92)} />
+          </div>
+          <IronCard className="p-4">
+            <span className="text-sm">{sg.viking.ironCard}</span>
+          </IronCard>
+          <IronCard gilded className="p-4">
+            <span className="text-sm">{sg.viking.ironCardGilded}</span>
+          </IronCard>
+          <span className="eyebrow">{sg.viking.bossStone}</span>
+          <BossStone
+            name={copy.samples.boss}
+            role={copy.samples.bossRole}
+            week={copy.samples.week}
+            status={copy.trophies.status.active}
+            statusTone="accent"
+            wall={
+              <ShieldWall
+                standing={7}
+                total={10}
+                toBreak={8}
+                label={copy.trophies.wallLabel(7, 10, 8)}
+              />
+            }
+          />
         </Section>
 
         <Section title={sg.sections.rewards}>

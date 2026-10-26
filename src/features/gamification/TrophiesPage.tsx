@@ -4,11 +4,14 @@ import { copy } from '@/copy';
 import { cn } from '@/lib/cn';
 import { formatLongDate } from '@/lib/dates';
 import { Badge } from '@/ui/Badge';
-import { BossPlaceholder } from '@/ui/BossPlaceholder';
-import { Card, CarvedCard } from '@/ui/Card';
+import { BossStone } from '@/ui/BossPlaceholder';
+import { IronCard } from '@/ui/IronCard';
+import { ShieldWall } from '@/ui/ShieldWall';
+import { Card } from '@/ui/Card';
 import { KnotDivider } from '@/ui/KnotDivider';
 import { ProgressBar } from '@/ui/ProgressBar';
 import { badges } from './badges';
+import { SHIELD_WALL, shieldsStanding, shieldsToBreak } from './bosses';
 import type { BossWeek } from './engine';
 import { levelProgress, rankForLevel } from './levels';
 import { FREEZE_MAX } from './streak';
@@ -57,6 +60,9 @@ export function TrophiesPage() {
     featured?.status === 'upcoming' &&
     arc.startDate <= featured.start;
 
+  const hpLeft = featured ? Math.max(0, featured.hp - featured.damage) : 0;
+  const standing = featured ? shieldsStanding(hpLeft, featured.hp) : 0;
+
   return (
     <div className="flex flex-col gap-8">
       <h1 className="text-2xl font-black">{t.title}</h1>
@@ -64,22 +70,36 @@ export function TrophiesPage() {
       <section className="flex flex-col gap-3" aria-label={t.bossSection}>
         <h2 className="eyebrow">{t.bossSection}</h2>
         {featured && (
-          <BossPlaceholder
+          <BossStone
             name={copy.bosses[featured.bossId].name}
             role={copy.bosses[featured.bossId].role}
             week={t.week(featured.index + 1, total)}
-            hp={Math.max(0, featured.hp - featured.damage)}
-            maxHp={featured.hp}
             status={t.status[featured.status]}
             statusTone={statusTone[featured.status]}
             defeated={featured.status === 'defeated'}
+            wall={
+              <>
+                <ShieldWall
+                  standing={standing}
+                  total={SHIELD_WALL}
+                  toBreak={shieldsToBreak()}
+                  label={t.wallLabel(standing, SHIELD_WALL, shieldsToBreak())}
+                />
+                <div className="flex w-full max-w-[250px] items-baseline justify-between gap-2 text-xs">
+                  <span className="text-muted">{t.wallHint(shieldsToBreak(), SHIELD_WALL)}</span>
+                  <span className="numeric text-sm">
+                    {hpLeft} / {featured.hp} {copy.common.hp}
+                  </span>
+                </div>
+              </>
+            }
             footer={
-              <p className="m-0 text-sm text-muted">
+              <p className="m-0 text-center text-sm text-muted">
                 {featured.status === 'upcoming'
                   ? inPrologue
                     ? t.prologue(formatLongDate(featured.start))
                     : t.beforeStart(formatLongDate(featured.start))
-                  : `${t.endsOn(formatLongDate(featured.end))} · ${t.defeatThreshold}`}
+                  : t.endsOn(formatLongDate(featured.end))}
               </p>
             }
           />
@@ -88,7 +108,7 @@ export function TrophiesPage() {
 
       <section className="flex flex-col gap-3" aria-label={t.rankSection}>
         <h2 className="eyebrow">{t.rankSection}</h2>
-        <CarvedCard ruleToken="--color-accent" innerClassName="flex flex-col gap-3">
+        <IronCard gilded className="flex flex-col gap-3 px-5 py-4">
           <div className="flex items-baseline justify-between gap-3">
             <span className="font-display text-3xl font-black uppercase tracking-display text-accent">
               {copy.ranks[game.rank]}
@@ -111,7 +131,7 @@ export function TrophiesPage() {
               {nextLevel ? t.nextRank(copy.ranks[rankForLevel(nextLevel)], nextLevel) : t.maxRank}
             </span>
           </div>
-        </CarvedCard>
+        </IronCard>
       </section>
 
       <section className="flex flex-col gap-3" aria-label={t.streakSection}>

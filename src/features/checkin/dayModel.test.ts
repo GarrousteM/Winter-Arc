@@ -1,6 +1,7 @@
 import type { Category, CheckIn, Goal } from '@/lib/types';
 import {
   appearsOn,
+  dayPlanks,
   dayStates,
   fillableDays,
   goalDayState,
@@ -190,5 +191,21 @@ describe('fillableDays', () => {
       '2027-01-31',
     ]);
     expect(fillableDays('2026-11-01', '2027-01-31', '2027-02-03')).toEqual([]);
+  });
+});
+
+describe('dayPlanks', () => {
+  it('donne une planche par objectif qui compte, dans l’ordre des catégories', () => {
+    const second: Category = { ...category, id: 'c2', order: 1, colorToken: '--cat-3' };
+    const reading = goal({ id: 'read', type: 'boolean', categoryId: 'c2' });
+    const states = dayStates('2026-11-02', {
+      goals: [reading, sugar, workout],
+      categories: [second, category],
+      index: indexCheckIns([check('read', '2026-11-02', 1, true)]),
+    });
+    expect(dayPlanks(states, [second, category])).toEqual([
+      { goalId: 'sugar', colorToken: '--cat-1', done: false },
+      { goalId: 'read', colorToken: '--cat-3', done: true },
+    ]);
   });
 });

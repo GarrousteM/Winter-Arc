@@ -78,6 +78,14 @@ Prises en phase 6 (à confirmer en revue) :
 39. **Neige de fond** sur les écrans à onglets (20 flocons, derrière le contenu), coupée si mouvement réduit.
 40. **Hébergement** : GitHub Pages via `.github/workflows/deploy.yml` (vérifications puis publication à chaque fusion dans `main`, base `/<nom-du-repo>/`).
 
+Direction « Saga gravée » (validée par Max après la phase 6) :
+
+41. **Bouclier du jour** à la place de l'anneau : une planche par objectif qui compte, peinte à la couleur de sa catégorie une fois réussi ; % sur la bosse en fer.
+42. **Bâton de comptage** sous « Jour X / N » dans l'en-tête des onglets : une encoche par jour, en or pour les jours écoulés, une marque par semaine.
+43. **Cases à cocher en petits boucliers ronds** ; catégories marquées d'une **pierre runique** ; objectifs en liste séparée par des traits gravés (sans cartes).
+44. **Boss gravé dans une pierre runique à bande-serpent** ; PV en **mur de 10 boucliers** (un bouclier entamé tient ; 8 à briser = 80 %). Nouveau rang dans une pierre à bande dorée.
+45. **Cartes clés en fer riveté** (`IronCard`, token `--color-iron` #4A5664, décor uniquement). Symboles nordiques récupérés par des groupes extrémistes (valknut, roue solaire, Othala à empattements, Wolfsangel) exclus.
+
 ## Choix techniques
 
 - Tailwind 3.4 avec `tailwind.config.ts` ; `colors`, `fontFamily`, `borderRadius`, `borderWidth`, `boxShadow` définis dans `theme` (pas `extend`) pour supprimer les valeurs par défaut.
