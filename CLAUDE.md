@@ -64,6 +64,13 @@ Prises en phase 4 (à confirmer en revue) :
 31. **Récompenses** : l'état célébré (`PlayerState`) ne recule jamais ; plusieurs level-ups en attente fusionnent en un seul écran ; une journée parfaite n'est célébrée qu'une fois par jour et par session.
 32. **Détox** : jours consécutifs où l'objectif `screen-time` est réussi, les jours où il n'est pas prévu sont ignorés. **Premier pas** : toute saisie, même partielle.
 
+Prises en phase 5 (à confirmer en revue) :
+
+33. **Taux de réussite d'un objectif** : jours prévus réussis / jours prévus écoulés (semaines au quota pour un hebdomadaire). Le jour ou la semaine en cours ne compte que s'il est déjà réussi.
+34. **Taux d'une catégorie** : objectifs qui comptent chaque jour (règle des hebdomadaires de la décision 2), sur 7 jours glissants et sur l'Arc entier.
+35. **Détail objectif** : un tap sur un objectif (Progression ou Objectifs) ouvre son détail ; l'édition et l'archivage se font depuis le détail.
+36. **Heatmap** : une seule teinte (glace) en 5 paliers (`--heat-0` à `--heat-4`), liseré or pour une journée parfaite, flocon pour un joker. Courbes en SVG fait main (`src/ui/LineChart.tsx`).
+
 ## Choix techniques
 
 - Tailwind 3.4 avec `tailwind.config.ts` ; `colors`, `fontFamily`, `borderRadius`, `borderWidth`, `boxShadow` définis dans `theme` (pas `extend`) pour supprimer les valeurs par défaut.

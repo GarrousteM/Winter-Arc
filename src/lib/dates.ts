@@ -63,3 +63,21 @@ export function formatLongDate(iso: ISODate, withYear = false): string {
   const formatted = (withYear ? longDateYear : longDate).format(fromISODate(iso));
   return formatted.replace(/^1 /, '1er ');
 }
+
+const shortDate = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' });
+const weekdayDate = new Intl.DateTimeFormat('fr-FR', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+});
+
+/** Date courte : « 3 nov. », « 1er nov. ». */
+export function formatShortDate(iso: ISODate): string {
+  return shortDate.format(fromISODate(iso)).replace(/^1 /, '1er ');
+}
+
+/** Date avec le jour : « Lundi 2 novembre ». */
+export function formatWeekdayDate(iso: ISODate): string {
+  const text = weekdayDate.format(fromISODate(iso)).replace(/ 1 /, ' 1er ');
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}

@@ -33,6 +33,13 @@
   --cat-5: #a0703c; /* cuir — extra 1 */
   --cat-6: #6b5b95; /* crépuscule — extra 2 */
 
+  /* Heatmap : une seule teinte (glace), du plus clair au plus intense, mélangée à la surface. */
+  --heat-0: var(--color-surface-raised);
+  --heat-1: color-mix(in srgb, var(--color-frost) 22%, var(--color-surface));
+  --heat-2: color-mix(in srgb, var(--color-frost) 45%, var(--color-surface));
+  --heat-3: color-mix(in srgb, var(--color-frost) 72%, var(--color-surface));
+  --heat-4: var(--color-frost);
+
   /* Typographie */
   --font-display: 'Cinzel', serif;
   --font-body: 'Barlow', sans-serif;

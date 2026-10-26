@@ -11,7 +11,8 @@ import { GoalsPage } from '@/features/goals/GoalsPage';
 import { AppLayout, RootGate } from './AppLayout';
 import { TodayPage } from '@/features/checkin/TodayPage';
 import { TrophiesPage } from '@/features/gamification/TrophiesPage';
-import { ProgressPlaceholder } from './routes/Placeholders';
+import { GoalDetailPage } from '@/features/stats/GoalDetailPage';
+import { ProgressPage } from '@/features/stats/ProgressPage';
 
 // Écrans rarement ouverts chargés à la demande, pour que l'écran Aujourd'hui s'ouvre vite.
 const routes: RouteObject[] = [
@@ -39,9 +40,10 @@ const routes: RouteObject[] = [
         element: <AppLayout />,
         children: [
           { path: '/', element: <TodayPage /> },
-          { path: '/progression', element: <ProgressPlaceholder /> },
+          { path: '/progression', element: <ProgressPage /> },
           { path: '/trophees', element: <TrophiesPage /> },
           { path: '/objectifs', element: <GoalsPage /> },
+          { path: '/objectifs/:goalId', element: <GoalDetailPage /> },
         ],
       },
       { path: '*', element: <Navigate to="/" replace /> },

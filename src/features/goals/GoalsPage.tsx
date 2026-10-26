@@ -9,6 +9,7 @@ import {
   PlusIcon,
 } from '@phosphor-icons/react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '@/app/store';
 import { copy } from '@/copy';
 import { cn } from '@/lib/cn';
@@ -20,14 +21,13 @@ import { KnotDivider } from '@/ui/KnotDivider';
 import { Sheet } from '@/ui/Sheet';
 import { CategoryForm } from './CategoryForm';
 import { iconFor } from './categoryIcons';
-import { GoalForm } from './GoalForm';
-import { nextColorToken, type GoalDraft } from './goalModel';
+import { GoalEditSheet, type GoalSheetTarget } from './GoalEditSheet';
+import { nextColorToken } from './goalModel';
 import { goalSummary } from './summary';
 
 const t = copy.goals;
 
 type CategorySheet = { mode: 'new' } | { mode: 'edit'; category: Category };
-type GoalSheet = { mode: 'new'; categoryId: string } | { mode: 'edit'; goal: Goal };
 
 const byOrder = <T extends { order: number }>(a: T, b: T) => a.order - b.order;
 
@@ -38,29 +38,18 @@ export function GoalsPage() {
   const updateCategory = useAppStore((s) => s.updateCategory);
   const moveCategory = useAppStore((s) => s.moveCategory);
   const setCategoryArchived = useAppStore((s) => s.setCategoryArchived);
-  const addGoal = useAppStore((s) => s.addGoal);
-  const updateGoal = useAppStore((s) => s.updateGoal);
   const setGoalStatus = useAppStore((s) => s.setGoalStatus);
   const moveGoal = useAppStore((s) => s.moveGoal);
+  const navigate = useNavigate();
 
   const [categorySheet, setCategorySheet] = useState<CategorySheet | null>(null);
-  const [goalSheet, setGoalSheet] = useState<GoalSheet | null>(null);
+  const [goalSheet, setGoalSheet] = useState<GoalSheetTarget | null>(null);
 
   const active = categories.filter((c) => !c.archived).sort(byOrder);
   const archivedCategories = categories.filter((c) => c.archived).sort(byOrder);
   const archivedGoals = goals.filter(
     (g) => g.status === 'archived' && active.some((c) => c.id === g.categoryId),
   );
-
-  const saveGoal = (draft: GoalDraft) => {
-    if (!goalSheet) return;
-    if (goalSheet.mode === 'new') {
-      addGoal(draft);
-    } else {
-      updateGoal(goalSheet.goal.id, { ...draft, tag: goalSheet.goal.tag });
-    }
-    setGoalSheet(null);
-  };
 
   return (
     <div className="flex flex-col gap-8">
@@ -119,7 +108,7 @@ export function GoalsPage() {
                 first={goalIndex === 0}
                 last={goalIndex === categoryGoals.length - 1}
                 onEdit={() => {
-                  setGoalSheet({ mode: 'edit', goal });
+                  void navigate(`/objectifs/${goal.id}`);
                 }}
                 onMove={(direction) => {
                   moveGoal(goal.id, direction);
@@ -253,57 +242,12 @@ export function GoalsPage() {
         )}
       </Sheet>
 
-      <Sheet
-        open={goalSheet !== null}
-        onOpenChange={(open) => {
-          if (!open) setGoalSheet(null);
+      <GoalEditSheet
+        target={goalSheet}
+        onClose={() => {
+          setGoalSheet(null);
         }}
-        title={goalSheet?.mode === 'edit' ? copy.goalForm.editTitle : copy.goalForm.newTitle}
-        closeLabel={copy.goalForm.close}
-        footer={
-          <>
-            {goalSheet?.mode === 'edit' && (
-              <Button
-                variant="danger"
-                icon={<ArchiveIcon size={18} />}
-                onClick={() => {
-                  setGoalStatus(goalSheet.goal.id, 'archived');
-                  setGoalSheet(null);
-                }}
-              >
-                {t.archive}
-              </Button>
-            )}
-            <Button block type="submit" form="goal-form" className="flex-1">
-              {goalSheet?.mode === 'edit' ? copy.goalForm.save : copy.goalForm.create}
-            </Button>
-          </>
-        }
-      >
-        {goalSheet && (
-          <div className="flex flex-col gap-4">
-            <GoalForm
-              key={goalSheet.mode === 'edit' ? goalSheet.goal.id : `new-${goalSheet.categoryId}`}
-              formId="goal-form"
-              editing={goalSheet.mode === 'edit'}
-              categories={active}
-              initial={
-                goalSheet.mode === 'edit'
-                  ? goalSheet.goal
-                  : {
-                      title: '',
-                      categoryId: goalSheet.categoryId,
-                      type: 'boolean',
-                      frequency: { kind: 'daily' },
-                      difficulty: 2,
-                    }
-              }
-              onSubmit={saveGoal}
-            />
-            {goalSheet.mode === 'edit' && <p className="m-0 text-sm text-muted">{t.historyKept}</p>}
-          </div>
-        )}
-      </Sheet>
+      />
     </div>
   );
 }
