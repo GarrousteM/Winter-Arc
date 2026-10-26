@@ -10,13 +10,19 @@ import { dayNumber, formatLongDate, today } from '@/lib/dates';
 import { vibrate } from '@/lib/haptics';
 import { playShieldThud } from '@/lib/sound';
 import type { ISODate } from '@/lib/types';
-import { CarvedCard } from '@/ui/Card';
 import { CategoryMarker } from '@/ui/CategoryMarker';
-import { ProgressRing } from '@/ui/ProgressRing';
+import { DayShield } from '@/ui/DayShield';
 import { RuneRow } from '@/ui/Rune';
 import { Segmented } from '@/ui/Segmented';
 import { ProgressBar } from '@/ui/ProgressBar';
-import { dayStates, fillableDays, indexCheckIns, summarizeDay, type DayContext } from './dayModel';
+import {
+  dayPlanks,
+  dayStates,
+  fillableDays,
+  indexCheckIns,
+  summarizeDay,
+  type DayContext,
+} from './dayModel';
 import { DayNoteField } from './DayNoteField';
 import { GoalCheckRow } from './GoalCheckRow';
 
@@ -94,9 +100,10 @@ export function TodayPage() {
 
   const activeCategories = categories.filter((c) => !c.archived).sort((a, b) => a.order - b.order);
   const percent = Math.round(summary.ratio * 100);
+  const planks = dayPlanks(states, categories);
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-6">
       {days.length > 1 && (
         <Segmented
           label={t.dayTabs}
@@ -109,60 +116,57 @@ export function TodayPage() {
         />
       )}
 
-      <CarvedCard innerClassName="flex items-center gap-4">
-        <ProgressRing value={summary.ratio} size={104} stroke={6} label={t.progressLabel}>
-          <span className="numeric text-3xl">{percent}</span>
-          <span className="numeric text-xs text-muted">
-            {t.completedOf(summary.completed, summary.counted)}
-          </span>
-        </ProgressRing>
-        <div className="flex min-w-0 flex-1 flex-col gap-2">
-          <div className="flex items-center gap-3">
-            <span className="numeric text-4xl text-accent">{progress.level}</span>
-            <div className="flex min-w-0 flex-col">
-              <span className="eyebrow">{copy.common.level}</span>
-              <span className="truncate font-display text-sm font-bold uppercase tracking-display">
-                {copy.ranks[rankForLevel(progress.level)]}
-              </span>
-            </div>
-          </div>
-          <ProgressBar
-            value={progress.needed > 0 ? progress.current / progress.needed : 0}
-            label={`${copy.common.xp} ${progress.level}`}
-          />
-          <div className="flex items-baseline justify-between gap-2">
-            <span className="numeric text-sm text-muted">
-              {progress.current} / {progress.needed} {copy.common.xp}
-            </span>
-            <span className="numeric text-sm text-accent">{t.xpToday(dayResult?.xp ?? 0)}</span>
-          </div>
-        </div>
-      </CarvedCard>
+      <section aria-label={t.progressLabel} className="flex flex-col items-center gap-3">
+        <DayShield
+          planks={planks.map((p) => ({ key: p.goalId, colorToken: p.colorToken, done: p.done }))}
+          center={String(percent)}
+          label={t.shieldLabel(summary.completed, summary.counted, percent)}
+        />
+        <span className="text-sm text-muted">
+          {t.planks(summary.completed, summary.counted)} ·{' '}
+          <span className="numeric text-base text-accent">{t.xpToday(dayResult?.xp ?? 0)}</span>
+        </span>
+      </section>
 
-      {game && (
-        <div className="flex items-center justify-between gap-3 rounded border border-border bg-surface px-4 py-2">
-          <div className="flex items-baseline gap-2">
-            <FireIcon size={18} className="self-center text-frost" />
-            <span className="eyebrow">{copy.streak.label}</span>
-            <span className="numeric text-2xl text-frost">{game.streak}</span>
-            <span className="text-sm text-muted">{copy.streak.unit(game.streak)}</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="numeric text-lg text-accent">
+      <div className="flex items-center gap-3 border-y border-border py-2">
+        <span className="numeric text-2xl text-accent">{progress.level}</span>
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <span className="truncate font-display text-xs font-bold uppercase tracking-display">
+            {copy.ranks[rankForLevel(progress.level)]}
+          </span>
+          <ProgressBar
+            thin
+            value={progress.needed > 0 ? progress.current / progress.needed : 0}
+            label={`${copy.common.level} ${progress.level}, ${progress.current} / ${progress.needed} ${copy.common.xp}`}
+          />
+        </div>
+        {game && (
+          <>
+            <span aria-hidden="true" className="h-7 w-px bg-border" />
+            <span
+              className="flex items-center gap-1"
+              aria-label={`${copy.streak.label} ${game.streak} ${copy.streak.unit(game.streak)}`}
+            >
+              <FireIcon size={16} className="text-frost" />
+              <span className="numeric text-xl text-frost">{game.streak}</span>
+            </span>
+            <span className="numeric text-base text-accent">
               {copy.streak.multiplier(multiplier)}
             </span>
-            <span
-              className="flex items-center gap-0.5"
-              role="img"
-              aria-label={copy.streak.tokens(game.freezeTokens)}
-            >
-              {Array.from({ length: game.freezeTokens }, (_, i) => (
-                <SnowflakeIcon key={i} size={18} className="text-frost" />
-              ))}
-            </span>
-          </div>
-        </div>
-      )}
+            {game.freezeTokens > 0 && (
+              <span
+                className="flex items-center gap-0.5"
+                role="img"
+                aria-label={copy.streak.tokens(game.freezeTokens)}
+              >
+                {Array.from({ length: game.freezeTokens }, (_, i) => (
+                  <SnowflakeIcon key={i} size={14} className="text-frost" />
+                ))}
+              </span>
+            )}
+          </>
+        )}
+      </div>
       {dayResult?.frozen && <p className="m-0 text-sm text-frost">{copy.streak.frozenNote}</p>}
 
       {states.length === 0 && <p className="m-0 text-muted">{t.nothingToday}</p>}
@@ -173,8 +177,10 @@ export function TodayPage() {
           .sort((a, b) => a.goal.order - b.goal.order);
         if (rows.length === 0) return null;
         return (
-          <section key={category.id} className="flex flex-col gap-2" aria-label={category.name}>
+          <section key={category.id} className="flex flex-col" aria-label={category.name}>
             <CategoryMarker
+              className="pb-1"
+              muted
               name={category.name}
               colorToken={category.colorToken}
               icon={iconFor(category.icon)}

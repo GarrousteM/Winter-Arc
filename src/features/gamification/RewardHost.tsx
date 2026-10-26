@@ -8,6 +8,7 @@ import { Badge } from '@/ui/Badge';
 import { BossSilhouette } from '@/ui/BossPlaceholder';
 import { KnotDivider } from '@/ui/KnotDivider';
 import { RuneRow } from '@/ui/Rune';
+import { RuneStone } from '@/ui/RuneStone';
 import { futhark } from '@/ui/runes';
 import { badges } from './badges';
 import { useRewardQueue } from './rewardQueue';
@@ -128,23 +129,31 @@ function RewardContent({ event }: { event: RewardEvent }) {
       return event.rankChanged ? (
         <>
           <RuneRow lit runes={futhark.slice(0, 8)} />
-          <Reveal delay={1}>
-            <span className="eyebrow text-accent">{r.newRank}</span>
-          </Reveal>
-          <motion.h2
-            className="text-5xl font-black text-accent"
-            initial={{ scale: 1.6, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: durations.reward, delay: 1.1, ease: easeHeavy }}
-          >
-            {copy.ranks[event.rank]}
-          </motion.h2>
-          <Reveal delay={1.6}>
-            <p className="m-0 max-w-xs text-muted">{copy.rankMeanings[event.rank]}</p>
-          </Reveal>
-          <Reveal delay={1.8}>
-            <span className="numeric text-3xl text-text">{r.level(event.level)}</span>
-          </Reveal>
+          <div className="w-64">
+            <RuneStone bandToken="--color-accent">
+              <div className="flex h-full flex-col items-center justify-center gap-3 pb-8">
+                <Reveal delay={1}>
+                  <span className="eyebrow text-accent">{r.newRank}</span>
+                </Reveal>
+                <motion.h2
+                  className="text-4xl font-black text-accent"
+                  initial={{ scale: 1.6, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: durations.reward, delay: 1.1, ease: easeHeavy }}
+                >
+                  {copy.ranks[event.rank]}
+                </motion.h2>
+                <Reveal delay={1.6}>
+                  <p className="m-0 max-w-[10rem] text-sm text-muted">
+                    {copy.rankMeanings[event.rank]}
+                  </p>
+                </Reveal>
+                <Reveal delay={1.8}>
+                  <span className="numeric text-3xl text-text">{r.level(event.level)}</span>
+                </Reveal>
+              </div>
+            </RuneStone>
+          </div>
           <RuneRow lit runes={futhark.slice(8, 16)} />
         </>
       ) : (

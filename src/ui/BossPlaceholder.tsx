@@ -3,6 +3,7 @@ import { copy } from '@/copy';
 import { cn } from '@/lib/cn';
 import { CarvedCard } from './Card';
 import { ProgressBar } from './ProgressBar';
+import { RuneStone } from './RuneStone';
 
 /** Silhouette gravée (hachures) en attendant les illustrations. Vaincu : barrée en or. */
 export function BossSilhouette({
@@ -45,16 +46,15 @@ export function BossSilhouette({
   );
 }
 
-type BossPlaceholderProps = {
+type BossStoneProps = {
   name: string;
   role: string;
   week: string;
-  /** PV restants. */
-  hp: number;
-  maxHp: number;
   status?: string;
   statusTone?: 'accent' | 'success' | 'warning' | 'muted';
   defeated?: boolean;
+  /** Mur de boucliers (PV) et sa légende, sous le nom. */
+  wall: ReactNode;
   footer?: ReactNode;
 };
 
@@ -65,29 +65,54 @@ const toneClass = {
   muted: 'text-muted',
 };
 
-/** Carte de boss : silhouette, nom en Cinzel, barre de PV restants. */
-export function BossPlaceholder({
+/** Boss de la semaine gravé dans une pierre runique à bande-serpent ; ses PV en mur de boucliers. */
+export function BossStone({
   name,
   role,
   week,
-  hp,
-  maxHp,
   status,
   statusTone = 'muted',
   defeated = false,
+  wall,
   footer,
-}: BossPlaceholderProps) {
+}: BossStoneProps) {
+  return (
+    <div className="flex flex-col gap-3">
+      <RuneStone bandToken={defeated ? '--color-accent' : '--color-frost-deep'}>
+        <div className="flex h-full flex-col items-center gap-2 text-center">
+          <div className="flex flex-col items-center gap-0.5">
+            <span className="eyebrow">{week}</span>
+            {status && <span className={cn('eyebrow', toneClass[statusTone])}>{status}</span>}
+          </div>
+          <BossSilhouette defeated={defeated} size={128} />
+          <div className="flex flex-col gap-1">
+            <h3 className="text-2xl font-black">{name}</h3>
+            <p className="m-0 text-sm text-muted">{role}</p>
+          </div>
+          <div className="mt-1 flex w-full flex-col items-center gap-1">{wall}</div>
+        </div>
+      </RuneStone>
+      {footer}
+    </div>
+  );
+}
+
+type BossPlaceholderProps = {
+  name: string;
+  role: string;
+  week: string;
+  /** PV restants. */
+  hp: number;
+  maxHp: number;
+};
+
+/** Ancienne carte de boss (styleguide) : silhouette, nom en Cinzel, barre de PV restants. */
+export function BossPlaceholder({ name, role, week, hp, maxHp }: BossPlaceholderProps) {
   const ratio = maxHp > 0 ? hp / maxHp : 0;
   return (
-    <CarvedCard
-      ruleToken={defeated ? '--color-accent' : '--color-border'}
-      innerClassName="flex flex-col items-center gap-3 text-center"
-    >
-      <div className="flex w-full items-baseline justify-between gap-2">
-        <span className="eyebrow">{week}</span>
-        {status && <span className={cn('eyebrow', toneClass[statusTone])}>{status}</span>}
-      </div>
-      <BossSilhouette defeated={defeated} />
+    <CarvedCard innerClassName="flex flex-col items-center gap-3 text-center">
+      <span className="eyebrow">{week}</span>
+      <BossSilhouette />
       <div className="flex flex-col gap-1">
         <h3 className="text-2xl font-black">{name}</h3>
         <p className="m-0 text-sm text-muted">{role}</p>
@@ -103,7 +128,6 @@ export function BossPlaceholder({
           {hp} / {maxHp} {copy.common.hp}
         </span>
       </div>
-      {footer}
     </CarvedCard>
   );
 }

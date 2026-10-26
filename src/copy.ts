@@ -66,6 +66,11 @@ export const copy = {
     dayTabs: 'Jour à remplir',
     dayLabels: { 0: "Aujourd'hui", 1: 'Hier', 2: 'Avant-hier' } as Record<number, string>,
     progressLabel: 'Progression du jour',
+    shieldLabel: (done: number, total: number, percent: number) =>
+      `Bouclier du jour : ${done} planche${done > 1 ? 's' : ''} peinte${done > 1 ? 's' : ''} sur ${total}, ${percent} %`,
+    planks: (done: number, total: number) =>
+      `${done} planche${done > 1 ? 's' : ''} peinte${done > 1 ? 's' : ''} sur ${total}`,
+    tallyLabel: (day: number, total: number) => `Bâton de comptage : jour ${day} sur ${total}`,
     completedOf: (done: number, total: number) => `${done} / ${total}`,
     xpToday: (xp: number) => `+${xp} ce jour`,
     nothingToday: 'Aucun objectif prévu ce jour-là.',
@@ -103,6 +108,9 @@ export const copy = {
     bossSection: 'Boss de la semaine',
     week: (n: number, total: number) => `Semaine ${n} / ${total}`,
     hpLeft: 'PV restants',
+    wallLabel: (standing: number, total: number, toBreak: number) =>
+      `Mur de boucliers : ${standing} debout sur ${total}, il faut en briser ${toBreak}`,
+    wallHint: (toBreak: number, total: number) => `Brise ${toBreak} boucliers sur ${total}`,
     defeatThreshold: 'Vaincu à 80 % des PV retirés',
     status: {
       upcoming: 'À venir',
@@ -402,6 +410,7 @@ export const copy = {
       progress: 'Progression',
       inputs: 'Saisie',
       forms: 'Formulaires',
+      viking: 'Saga gravée',
       ornaments: 'Ornements',
       rewards: 'Boss et badges',
       navigation: 'Navigation',
@@ -454,6 +463,13 @@ export const copy = {
       boolean: 'Objectif oui / non',
       quantity: 'Objectif quantité',
       limit: 'Objectif limite',
+    },
+    viking: {
+      shield: 'Bouclier du jour (une planche par objectif)',
+      tally: 'Bâton de comptage (une encoche par jour)',
+      ironCard: 'Carte en fer riveté',
+      ironCardGilded: 'Carte clé cerclée d’or',
+      bossStone: 'Boss en pierre runique, PV en mur de boucliers',
     },
     forms: {
       openSheet: 'Ouvrir un panneau',

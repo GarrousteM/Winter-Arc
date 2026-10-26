@@ -10,6 +10,8 @@ type ProgressBarProps = {
   className?: string;
   /** Repère vertical (0 à 1), ex. le seuil de 50 % ou la limite. */
   marker?: number;
+  /** Version fine (listes et bandeaux). */
+  thin?: boolean;
 };
 
 export function ProgressBar({
@@ -18,11 +20,16 @@ export function ProgressBar({
   label,
   className,
   marker,
+  thin = false,
 }: ProgressBarProps) {
   const clamped = Math.min(1, Math.max(0, value));
   return (
     <div
-      className={cn('relative h-2 w-full border border-border bg-bg', className)}
+      className={cn(
+        'relative w-full border border-border bg-bg',
+        thin ? 'h-1.5' : 'h-2',
+        className,
+      )}
       role="progressbar"
       aria-label={label}
       aria-valuemin={0}

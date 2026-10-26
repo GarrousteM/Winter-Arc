@@ -20,6 +20,7 @@ const config: Config = {
       accent: 'var(--color-accent)',
       frost: 'var(--color-frost)',
       'frost-deep': 'var(--color-frost-deep)',
+      iron: 'var(--color-iron)',
       sky: 'var(--color-sky)',
       success: 'var(--color-success)',
       warning: 'var(--color-warning)',
