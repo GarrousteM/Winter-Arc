@@ -2,6 +2,7 @@ import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { daysInclusive, dayNumber, today } from '@/lib/dates';
 import { AppHeader } from '@/ui/AppHeader';
 import { BottomNav } from '@/ui/BottomNav';
+import { RewardHost } from '@/features/gamification/RewardHost';
 import { useAppStore } from './store';
 
 /** Attend la lecture d'IndexedDB, puis envoie vers l'onboarding tant qu'aucun Arc n'existe. */
@@ -38,6 +39,7 @@ export function AppLayout() {
         <Outlet />
       </main>
       <BottomNav />
+      <RewardHost />
     </div>
   );
 }

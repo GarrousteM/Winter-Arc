@@ -54,6 +54,16 @@ Prises en phase 3 (à confirmer en revue) :
 24. **Décocher / vider un champ** supprime le check-in du jour.
 25. **XP affiché en phase 3** : XP de base (objectifs, dépassement, journée parfaite). Multiplicateur de série, boss, streak et jokers arrivent avec le moteur complet en phase 4.
 
+Prises en phase 4 (à confirmer en revue) :
+
+26. **Série globale** : un jour sans objectif qui compte (ex. repos hebdomadaire) ne casse pas la série et la prolonge. La journée en cours ne casse jamais la série et ne consomme pas de joker.
+27. **Multiplicateur** : calculé avec la série qui inclut le jour (le 7e jour consécutif est déjà à ×1,1). Il s'applique aux XP des objectifs, arrondi par jour ; bonus de dépassement, journée parfaite et boss restent hors multiplicateur.
+28. **Joker** : jamais consommé si la série est à 0.
+29. **Ordre des boss** : ordre de SPEC.md, Fenrir toujours sur la dernière semaine ; pour un Arc de plus de 13 semaines, les 12 premiers se répètent.
+30. **PV des boss** : calculés avec les objectifs actuels (mettre en pause ou archiver un objectif change les PV).
+31. **Récompenses** : l'état célébré (`PlayerState`) ne recule jamais ; plusieurs level-ups en attente fusionnent en un seul écran ; une journée parfaite n'est célébrée qu'une fois par jour et par session.
+32. **Détox** : jours consécutifs où l'objectif `screen-time` est réussi, les jours où il n'est pas prévu sont ignorés. **Premier pas** : toute saisie, même partielle.
+
 ## Choix techniques
 
 - Tailwind 3.4 avec `tailwind.config.ts` ; `colors`, `fontFamily`, `borderRadius`, `borderWidth`, `boxShadow` définis dans `theme` (pas `extend`) pour supprimer les valeurs par défaut.

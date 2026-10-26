@@ -10,12 +10,14 @@ import {
 import { GoalsPage } from '@/features/goals/GoalsPage';
 import { AppLayout, RootGate } from './AppLayout';
 import { TodayPage } from '@/features/checkin/TodayPage';
-import { ProgressPlaceholder, TrophiesPlaceholder } from './routes/Placeholders';
+import { TrophiesPage } from '@/features/gamification/TrophiesPage';
+import { ProgressPlaceholder } from './routes/Placeholders';
 
 // Écrans rarement ouverts chargés à la demande, pour que l'écran Aujourd'hui s'ouvre vite.
 const routes: RouteObject[] = [
   {
     path: '/styleguide',
+    hydrateFallbackElement: <></>,
     lazy: async () => ({ Component: (await import('./routes/StyleguidePage')).StyleguidePage }),
   },
   {
@@ -23,12 +25,14 @@ const routes: RouteObject[] = [
     children: [
       {
         path: '/bienvenue',
+        hydrateFallbackElement: <></>,
         lazy: async () => ({
           Component: (await import('@/features/arc/OnboardingPage')).OnboardingPage,
         }),
       },
       {
         path: '/reglages',
+        hydrateFallbackElement: <></>,
         lazy: async () => ({ Component: (await import('./routes/SettingsPage')).SettingsPage }),
       },
       {
@@ -36,7 +40,7 @@ const routes: RouteObject[] = [
         children: [
           { path: '/', element: <TodayPage /> },
           { path: '/progression', element: <ProgressPlaceholder /> },
-          { path: '/trophees', element: <TrophiesPlaceholder /> },
+          { path: '/trophees', element: <TrophiesPage /> },
           { path: '/objectifs', element: <GoalsPage /> },
         ],
       },
