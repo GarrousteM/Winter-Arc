@@ -50,7 +50,10 @@ export function AppHeader({ day, totalDays, onSettings }: AppHeaderProps) {
         {/* Le drakkar navigue sur le bâton : posé sur le jour en cours. */}
         <div
           className="pointer-events-none absolute bottom-[10px] -translate-x-1/2"
-          style={{ left: `${((before ? 0 : shown - 0.5) / Math.max(1, totalDays)) * 100}%` }}
+          style={{
+            // Centré sur le jour en cours, sans jamais déborder du bâton (avant le début, dernier jour).
+            left: `clamp(15px, ${((before ? 0 : shown - 0.5) / Math.max(1, totalDays)) * 100}%, calc(100% - 15px))`,
+          }}
         >
           <Drakkar size={30} />
         </div>

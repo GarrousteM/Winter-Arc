@@ -18,10 +18,10 @@ import { vibrate } from '@/lib/haptics';
 import { playShieldThud } from '@/lib/sound';
 import type { ISODate } from '@/lib/types';
 import { FjordHorizon } from '@/ui/FjordHorizon';
+import { CampfireVignette, DrakkarVignette } from '@/ui/Vignettes';
 import { Button } from '@/ui/Button';
 import { CategoryMarker } from '@/ui/CategoryMarker';
 import { DayShield } from '@/ui/DayShield';
-import { RuneRow } from '@/ui/Rune';
 import { Segmented } from '@/ui/Segmented';
 import { ProgressBar } from '@/ui/ProgressBar';
 import { dayStates, fillableDays, indexCheckIns, summarizeDay, type DayContext } from './dayModel';
@@ -92,9 +92,9 @@ export function TodayPage() {
     const before = now < arc.startDate;
     return (
       <div className="flex flex-col items-center gap-5 pt-8 text-center">
-        <RuneRow />
         <h1 className="text-2xl font-black">{before ? t.beforeStartTitle : t.afterEndTitle}</h1>
-        <p className="m-0 text-muted">
+        <DrakkarVignette size={260} />
+        <p className="m-0 max-w-xs text-muted">
           {before ? t.beforeStart(formatLongDate(arc.startDate)) : t.afterEnd}
         </p>
       </div>
@@ -104,6 +104,7 @@ export function TodayPage() {
   const activeCategories = categories.filter((c) => !c.archived).sort((a, b) => a.order - b.order);
   const percent = Math.round(summary.ratio * 100);
   const isTruce = restDays.includes(date);
+  const campfire = isTruce && summary.completed === 0;
   const next = game ? milestones(game, now) : undefined;
   // Jours encore rattrapables avec des objectifs non saisis (seulement depuis l'onglet Aujourd'hui).
   const missing =
@@ -154,21 +155,30 @@ export function TodayPage() {
         </div>
       ))}
 
-      <section aria-label={t.progressLabel} className="flex flex-col items-center gap-3">
-        <DayShield
-          done={summary.completed}
-          total={summary.counted}
-          unit={t.shieldUnit}
-          label={t.shieldLabel(summary.completed, summary.counted, percent)}
-        />
-        <span className="text-sm text-muted">
-          <span className="numeric text-base text-text">{t.dayPercent(percent)}</span> ·{' '}
-          <span className="numeric text-base text-accent">{t.xpToday(dayResult?.xp ?? 0)}</span>
-        </span>
-        {optionalNames && (
-          <span className="text-center text-xs text-frost">{t.optional(optionalNames)}</span>
-        )}
-      </section>
+      {/* Jour de trêve sans rien de coché : le feu de camp remplace le bouclier du jour. */}
+      {campfire ? (
+        <section aria-label={t.truceTitle} className="flex flex-col items-center gap-2 text-center">
+          <CampfireVignette size={200} />
+          <h2 className="eyebrow text-frost">{t.truceTitle}</h2>
+          <p className="m-0 max-w-xs text-sm text-muted">{t.truceRest}</p>
+        </section>
+      ) : (
+        <section aria-label={t.progressLabel} className="flex flex-col items-center gap-3">
+          <DayShield
+            done={summary.completed}
+            total={summary.counted}
+            unit={t.shieldUnit}
+            label={t.shieldLabel(summary.completed, summary.counted, percent)}
+          />
+          <span className="text-sm text-muted">
+            <span className="numeric text-base text-text">{t.dayPercent(percent)}</span> ·{' '}
+            <span className="numeric text-base text-accent">{t.xpToday(dayResult?.xp ?? 0)}</span>
+          </span>
+          {optionalNames && (
+            <span className="text-center text-xs text-frost">{t.optional(optionalNames)}</span>
+          )}
+        </section>
+      )}
 
       <div className="flex items-center gap-3 border-y border-border py-2">
         <span className="numeric text-2xl text-accent">{progress.level}</span>
@@ -211,7 +221,7 @@ export function TodayPage() {
       </div>
       {dayResult?.frozen && <p className="m-0 text-sm text-frost">{copy.streak.frozenNote}</p>}
 
-      {isTruce && (
+      {isTruce && !campfire && (
         <p className="m-0 flex items-center gap-2 text-sm text-frost">
           <CampfireIcon size={18} />
           {t.truceDay}
