@@ -37,11 +37,22 @@ Validées en fin de phase 1 :
 14. **Barre d'onglets** : libellés en Barlow 500, casse normale (le Cinzel capitales débordait à 375 px).
 15. **Tailwind 3.4** conservé (alertes `npm audit` limitées à l'outillage de build).
 
+Prises en phase 2 (à confirmer en revue) :
+
+16. **Extensions du modèle** (`src/lib/types.ts`) : `Category.archived` ; `Goal.status` (`active` | `paused` | `archived`, remplace `active: boolean`), `Goal.order`, `Goal.step` (pas du stepper), `Goal.tag`, `Goal.targetHistory` ; `DayNote` ; `Preferences` (sons, vibrations).
+17. **Changement de cible** : effectif dès aujourd'hui (le jour en cours prend la nouvelle cible), les jours passés gardent l'ancienne.
+18. **Jours de la semaine** : numérotation ISO, 1 = lundi … 7 = dimanche.
+19. **Durée minimale d'un Arc** : 8 jours (fin au moins 7 jours après le début).
+20. **Archiver une catégorie** retire ses objectifs des écrans sans toucher à leur statut ni à leur historique ; la restaurer les fait revenir.
+
 ## Choix techniques
 
 - Tailwind 3.4 avec `tailwind.config.ts` ; `colors`, `fontFamily`, `borderRadius`, `borderWidth`, `boxShadow` définis dans `theme` (pas `extend`) pour supprimer les valeurs par défaut.
 - ESLint interdit les littéraux de couleur (`#hex`, `rgb()`, `hsl()`) hors tests et fichiers de config.
 - Routage : React Router. Polices auto-hébergées via `@fontsource` (hors ligne).
+- Store unique Zustand (`src/app/store.ts`) persisté dans IndexedDB (`src/lib/storage.ts`, repli mémoire). `RootGate` attend la réhydratation puis redirige vers `/bienvenue` tant qu'il n'y a pas d'Arc.
+- Styleguide, onboarding et réglages chargés à la demande (`lazy`) ; bibliothèques découpées en chunks (`vite.config.ts`) pour un build sans warning.
+- `hoverOnlyWhenSupported` : pas d'état de survol collé après un tap.
 - Coins coupés : classe `.notched` (clip-path piloté par `--n`) ; un calque intérieur décalé de p px utilise `--n: calc(var(--notch) - 0.586 * p)`.
 
 ## Commandes

@@ -1,19 +1,53 @@
 import { IconContext } from '@phosphor-icons/react';
 import { MotionConfig } from 'framer-motion';
-import { createBrowserRouter, createMemoryRouter, RouterProvider } from 'react-router-dom';
-import { HomePlaceholder } from './routes/HomePlaceholder';
-import { StyleguidePage } from './routes/StyleguidePage';
+import {
+  createBrowserRouter,
+  createMemoryRouter,
+  Navigate,
+  RouterProvider,
+  type RouteObject,
+} from 'react-router-dom';
+import { GoalsPage } from '@/features/goals/GoalsPage';
+import { AppLayout, RootGate } from './AppLayout';
+import { ProgressPlaceholder, TodayPlaceholder, TrophiesPlaceholder } from './routes/Placeholders';
 
-const routes = [
-  { path: '/', element: <HomePlaceholder /> },
-  { path: '/styleguide', element: <StyleguidePage /> },
-  { path: '*', element: <HomePlaceholder /> },
+// Écrans rarement ouverts chargés à la demande, pour que l'écran Aujourd'hui s'ouvre vite.
+const routes: RouteObject[] = [
+  {
+    path: '/styleguide',
+    lazy: async () => ({ Component: (await import('./routes/StyleguidePage')).StyleguidePage }),
+  },
+  {
+    element: <RootGate />,
+    children: [
+      {
+        path: '/bienvenue',
+        lazy: async () => ({
+          Component: (await import('@/features/arc/OnboardingPage')).OnboardingPage,
+        }),
+      },
+      {
+        path: '/reglages',
+        lazy: async () => ({ Component: (await import('./routes/SettingsPage')).SettingsPage }),
+      },
+      {
+        element: <AppLayout />,
+        children: [
+          { path: '/', element: <TodayPlaceholder /> },
+          { path: '/progression', element: <ProgressPlaceholder /> },
+          { path: '/trophees', element: <TrophiesPlaceholder /> },
+          { path: '/objectifs', element: <GoalsPage /> },
+        ],
+      },
+      { path: '*', element: <Navigate to="/" replace /> },
+    ],
+  },
 ];
 
-// Build de démo (aperçu hébergé sans contrôle de l'URL) : routeur en mémoire, ouvert sur le styleguide.
+// Build de démo (aperçu hébergé sans contrôle de l'URL) : routeur en mémoire.
 const router =
   import.meta.env.VITE_ROUTER === 'memory'
-    ? createMemoryRouter(routes, { initialEntries: ['/styleguide'] })
+    ? createMemoryRouter(routes, { initialEntries: ['/'] })
     : createBrowserRouter(routes);
 
 // Une seule librairie d'icônes (Phosphor), un seul poids (bold).

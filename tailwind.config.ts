@@ -4,6 +4,8 @@ import type { Config } from 'tailwindcss';
 // Les clés sont définies dans `theme` (et non `extend`) pour supprimer la palette Tailwind par défaut.
 const config: Config = {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
+  // Pas d'état de survol collé après un tap sur écran tactile.
+  future: { hoverOnlyWhenSupported: true },
   theme: {
     colors: {
       transparent: 'transparent',
