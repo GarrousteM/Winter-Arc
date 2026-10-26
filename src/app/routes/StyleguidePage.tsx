@@ -20,7 +20,6 @@ import { copy } from '@/copy';
 import { contrastLevel, contrastRatio, type ContrastLevel } from '@/lib/contrast';
 import { AppHeader } from '@/ui/AppHeader';
 import { Badge } from '@/ui/Badge';
-import { BossPlaceholder } from '@/ui/BossPlaceholder';
 import { BottomNav } from '@/ui/BottomNav';
 import { Button, IconButton } from '@/ui/Button';
 import { Card, CarvedCard } from '@/ui/Card';
@@ -34,7 +33,9 @@ import { futhark } from '@/ui/runes';
 import { SnowField } from '@/ui/SnowField';
 import { Stepper } from '@/ui/Stepper';
 import { XpBar } from '@/ui/XpBar';
-import { BossStone } from '@/ui/BossPlaceholder';
+import { BossStone } from '@/ui/BossStone';
+import { BossEngraving } from '@/features/gamification/BossEngraving';
+import { BOSS_IDS } from '@/features/gamification/bosses';
 import { DayShield } from '@/ui/DayShield';
 import { IronCard } from '@/ui/IronCard';
 import { ShieldWall } from '@/ui/ShieldWall';
@@ -536,6 +537,7 @@ export function StyleguidePage() {
             week={copy.samples.week}
             status={copy.trophies.status.active}
             statusTone="accent"
+            art={<BossEngraving bossId="draugr" size={150} />}
             wall={
               <ShieldWall
                 standing={7}
@@ -548,14 +550,15 @@ export function StyleguidePage() {
         </Section>
 
         <Section title={sg.sections.rewards}>
-          <span className="eyebrow">{sg.rewards.boss}</span>
-          <BossPlaceholder
-            name={copy.samples.boss}
-            role={copy.samples.bossRole}
-            week={copy.samples.week}
-            hp={620}
-            maxHp={1400}
-          />
+          <span className="eyebrow">{sg.viking.bestiary}</span>
+          <ul className="m-0 grid list-none grid-cols-3 gap-3 p-0">
+            {BOSS_IDS.map((id, i) => (
+              <li key={id} className="flex flex-col items-center gap-1 text-center">
+                <BossEngraving bossId={id} defeated={i === 0} size={96} />
+                <span className="text-xs text-muted">{copy.bosses[id].name}</span>
+              </li>
+            ))}
+          </ul>
           <span className="eyebrow">{sg.rewards.badges}</span>
           <div className="flex flex-wrap justify-center gap-4">
             <Badge

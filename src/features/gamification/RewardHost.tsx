@@ -5,11 +5,11 @@ import { copy } from '@/copy';
 import { durations, easeHeavy, usePrefersReducedMotion } from '@/lib/motion';
 import { playCrash, playShieldThud, playWarHorn } from '@/lib/sound';
 import { Badge } from '@/ui/Badge';
-import { BossSilhouette } from '@/ui/BossPlaceholder';
 import { KnotDivider } from '@/ui/KnotDivider';
 import { RuneRow } from '@/ui/Rune';
 import { RuneStone } from '@/ui/RuneStone';
 import { futhark } from '@/ui/runes';
+import { BossEngraving } from './BossEngraving';
 import { badges } from './badges';
 import { useRewardQueue } from './rewardQueue';
 import { indexCheckIns } from '@/features/checkin/dayModel';
@@ -161,7 +161,7 @@ function RewardContent({ event }: { event: RewardEvent }) {
         <>
           <span className="eyebrow">{r.boss}</span>
           <Reveal delay={0.2}>
-            <BossSilhouette defeated />
+            <BossEngraving bossId={event.bossId} defeated size={180} />
           </Reveal>
           <Reveal delay={0.5}>
             <h2 className="text-4xl font-black">{copy.bosses[event.bossId].name}</h2>
@@ -271,7 +271,7 @@ function RecapContent({ recap }: { recap: WeeklyRecap }) {
     <>
       <span className="eyebrow text-accent">{r.recapEyebrow(recap.index + 1)}</span>
       <Reveal delay={0.2}>
-        <BossSilhouette defeated={recap.defeated} size={110} />
+        <BossEngraving bossId={recap.bossId} defeated={recap.defeated} size={150} />
       </Reveal>
       <Reveal delay={0.4}>
         <h2 className={recap.defeated ? 'text-3xl font-black text-accent' : 'text-3xl font-black'}>

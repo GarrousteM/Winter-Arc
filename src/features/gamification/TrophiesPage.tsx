@@ -4,7 +4,8 @@ import { copy } from '@/copy';
 import { cn } from '@/lib/cn';
 import { formatLongDate } from '@/lib/dates';
 import { Badge } from '@/ui/Badge';
-import { BossStone } from '@/ui/BossPlaceholder';
+import { BossStone } from '@/ui/BossStone';
+import { BossEngraving } from './BossEngraving';
 import { IronCard } from '@/ui/IronCard';
 import { ShieldWall } from '@/ui/ShieldWall';
 import { Card } from '@/ui/Card';
@@ -77,6 +78,13 @@ export function TrophiesPage() {
             status={t.status[featured.status]}
             statusTone={statusTone[featured.status]}
             defeated={featured.status === 'defeated'}
+            art={
+              <BossEngraving
+                bossId={featured.bossId}
+                defeated={featured.status === 'defeated'}
+                size={150}
+              />
+            }
             wall={
               <>
                 <ShieldWall
