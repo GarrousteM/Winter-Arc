@@ -1,4 +1,6 @@
-# Winter Arc
+# Fimbul
+
+L'app s'appelait Winter Arc. Nom et logo validés par Max après la phase 6 (décision 54).
 
 Application web React mobile-first (PWA, 100 % locale) qui transforme un défi de 92 jours en jeu de progression.
 
@@ -100,6 +102,7 @@ Illustrations (validées par Max) :
 
 52. **Horizon de fjord** (`src/ui/FjordHorizon.tsx`) : aurore en fines lignes de glace (sans halo), montagnes et falaises gravées, drakkar dont la lanterne est le seul point d'or. En bas des écrans retour, récap et nouveau rang (hauteur `min(30dvh, 260px)`). Sur Aujourd'hui, décor seulement, dans des zones déjà vides : aurore pâle dans le ciel de l'en-tête, petit drakkar posé sur le jour en cours du bâton de comptage, vignette de fjord en fin de liste.
 53. **Vignettes gravées** (`src/ui/Vignettes.tsx`) : drakkar à quai sur les écrans « Veille de l'hiver » (avant l'Arc) et « L'hiver est passé » (après) ; feu de camp à la place du bouclier du jour un jour de trêve tant que rien n'est coché (le bouclier revient dès la première coche). Le petit drakkar du bâton reste dans ses bornes avant le début et le dernier jour.
+54. **Nom et logo : Fimbul**, « Survis au Grand Hiver » (le Fimbulvetr des sagas, qui s'achève avec Fenrir, boss final). Le logo est la gravure de Fenrir simplifiée : tête de face, collerette, yeux d'or, soleil noir (`public/icons/*.svg`, PNG générés depuis les SVG ; `src/ui/FimbulLogo.tsx` en tête de l'onboarding). Identifiants internes inchangés pour ne rien perdre : clé IndexedDB `winter-arc`, champ `app` des sauvegardes `winter-arc` ; seul le nom de fichier d'export devient `fimbul-AAAA-MM-JJ.json`. Le nom par défaut d'un Arc reste « Winter Arc AAAA » (c'est le nom du défi).
 
 ## Choix techniques
 

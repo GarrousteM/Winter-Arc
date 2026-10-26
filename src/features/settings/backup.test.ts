@@ -55,7 +55,7 @@ describe('sauvegarde', () => {
   });
 
   it('nomme le fichier avec la date', () => {
-    expect(backupFileName('2026-11-03')).toBe('winter-arc-2026-11-03.json');
+    expect(backupFileName('2026-11-03')).toBe('fimbul-2026-11-03.json');
   });
 });
 
