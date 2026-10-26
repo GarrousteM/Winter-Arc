@@ -47,6 +47,13 @@ Prises en phase 2 (à confirmer en revue) :
 
 21. **Bleu hivernal** (demande de Max après la phase 2) : neutres bleutés (`--color-bg` #0B111A, surfaces #121B27 / #1A2534, fer froid #2A3A4E, neige #E6EDF3, brume #8E9DB0), ciel polaire `--color-sky` #13233A en dégradé bleu sur bleu en haut d'écran, `--color-frost-deep` #3B5F80 pour les ornements (entrelacs, runes au repos, graduations), neige en glace. L'or reste réservé aux actions et à l'XP.
 
+Prises en phase 3 (à confirmer en revue) :
+
+22. **Objectifs de l'onboarding** : ils existent dès le début de l'Arc (`createdAt` et première cible datés du premier jour), pour pouvoir rattraper un Arc commencé avant l'installation. Un objectif ajouté plus tard n'existe qu'à partir de sa création (sinon il casserait après coup des journées parfaites).
+23. **Anneau du jour** : part des objectifs qui comptent et sont réussis (une quantité partielle n'est pas réussie, même si elle rapporte de l'XP).
+24. **Décocher / vider un champ** supprime le check-in du jour.
+25. **XP affiché en phase 3** : XP de base (objectifs, dépassement, journée parfaite). Multiplicateur de série, boss, streak et jokers arrivent avec le moteur complet en phase 4.
+
 ## Choix techniques
 
 - Tailwind 3.4 avec `tailwind.config.ts` ; `colors`, `fontFamily`, `borderRadius`, `borderWidth`, `boxShadow` définis dans `theme` (pas `extend`) pour supprimer les valeurs par défaut.
