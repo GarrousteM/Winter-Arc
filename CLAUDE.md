@@ -32,6 +32,11 @@ Validées le 2026-10-26 :
 12. **Courbe d'XP** : formule de SPEC.md conservée telle quelle.
 13. **Git** : une branche par phase (`phase-N-…`), PR en fin de phase.
 
+Validées en fin de phase 1 :
+
+14. **Barre d'onglets** : libellés en Barlow 500, casse normale (le Cinzel capitales débordait à 375 px).
+15. **Tailwind 3.4** conservé (alertes `npm audit` limitées à l'outillage de build).
+
 ## Choix techniques
 
 - Tailwind 3.4 avec `tailwind.config.ts` ; `colors`, `fontFamily`, `borderRadius`, `borderWidth`, `boxShadow` définis dans `theme` (pas `extend`) pour supprimer les valeurs par défaut.
