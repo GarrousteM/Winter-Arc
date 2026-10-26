@@ -159,12 +159,7 @@ export const copy = {
     recapStrongDays: (n: number, total: number) => `${n} / ${total} jours à 80 %`,
     recapPerfect: (n: number) => `${n} journée${n > 1 ? 's' : ''} parfaite${n > 1 ? 's' : ''}`,
     recapXp: (xp: number) => `+${xp} XP`,
-    recapDelta: (delta: number) =>
-      delta > 0
-        ? `+${delta} XP par rapport à la semaine d’avant`
-        : delta < 0
-          ? `${delta} XP par rapport à la semaine d’avant`
-          : 'Autant d’XP que la semaine d’avant',
+    recapDelta: (delta: number) => `+${delta} XP par rapport à la semaine d’avant`,
     recapBestGoal: (title: string, done: number, total: number) =>
       `Meilleur objectif : ${title} (${done}/${total})`,
     recapStreak: (n: number) => `Série en cours : ${n} jour${n > 1 ? 's' : ''}`,
