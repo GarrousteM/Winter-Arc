@@ -129,6 +129,7 @@ export function GoalDetailPage() {
           <Heatmap
             weeks={weeks}
             weekdays={copy.progress.weekdays}
+            formatDay={copy.progress.dayNumber}
             selected={selected}
             onSelect={setSelected}
             label={t.calendar}

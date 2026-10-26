@@ -3,6 +3,7 @@ import { useEffect, useRef, type ReactNode } from 'react';
 import { useAppStore } from '@/app/store';
 import { copy } from '@/copy';
 import { durations, easeHeavy, usePrefersReducedMotion } from '@/lib/motion';
+import { playCrash, playShieldThud, playWarHorn } from '@/lib/sound';
 import { Badge } from '@/ui/Badge';
 import { BossSilhouette } from '@/ui/BossPlaceholder';
 import { KnotDivider } from '@/ui/KnotDivider';
@@ -173,6 +174,14 @@ function RewardContent({ event }: { event: RewardEvent }) {
 /** Écran plein de récompense : fermeture par tap ou Échap. */
 function RewardOverlay({ event, onClose }: { event: RewardEvent; onClose: () => void }) {
   const ref = useRef<HTMLButtonElement>(null);
+  const soundOn = useAppStore((s) => s.preferences.sound);
+  useEffect(() => {
+    if (!soundOn) return;
+    if (event.kind === 'level') playWarHorn(true);
+    else if (event.kind === 'perfect') playWarHorn(false);
+    else if (event.kind === 'boss') playCrash();
+    else playShieldThud();
+  }, [event, soundOn]);
   useEffect(() => {
     ref.current?.focus();
     const onKey = (e: KeyboardEvent) => {

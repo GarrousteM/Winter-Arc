@@ -76,6 +76,7 @@ export function ProgressPage() {
         <Heatmap
           weeks={weeks}
           weekdays={t.weekdays}
+          formatDay={t.dayNumber}
           selected={selected}
           onSelect={setSelected}
           label={t.heatmap}

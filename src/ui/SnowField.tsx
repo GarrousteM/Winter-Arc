@@ -36,7 +36,7 @@ export function SnowField({ count = 36 }: SnowFieldProps) {
   if (reduced) return null;
 
   return (
-    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+    <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
       {flakes.map((f) => (
         <span
           key={f.id}

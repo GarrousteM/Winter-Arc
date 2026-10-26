@@ -20,13 +20,15 @@ type HeatmapProps = {
   selected: ISODate | undefined;
   onSelect: (date: ISODate) => void;
   label: string;
+  /** Numéro affiché dans la case (ex. « 1er » le premier du mois). */
+  formatDay: (day: number) => string;
 };
 
 /**
  * Calendrier de l'Arc : 7 colonnes (lundi → dimanche), une ligne par semaine.
  * Intensité en une seule teinte (glace) ; journée parfaite = liseré or, joker = flocon.
  */
-export function Heatmap({ weeks, weekdays, selected, onSelect, label }: HeatmapProps) {
+export function Heatmap({ weeks, weekdays, selected, onSelect, label, formatDay }: HeatmapProps) {
   return (
     <div role="grid" aria-label={label} className="flex flex-col gap-1">
       <div role="row" className="grid grid-cols-7 gap-1">
@@ -78,10 +80,9 @@ export function Heatmap({ weeks, weekdays, selected, onSelect, label }: HeatmapP
                       : cell.today
                         ? 'text-accent'
                         : ink,
-                    day === 1 && 'underline',
                   )}
                 >
-                  {day}
+                  {formatDay(day)}
                 </span>
                 {cell.frozen && (
                   <SnowflakeIcon size={10} className="absolute right-0.5 top-0.5 text-frost" />
