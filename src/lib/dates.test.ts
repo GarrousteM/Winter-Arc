@@ -4,6 +4,8 @@ import {
   daysInclusive,
   defaultArcDates,
   formatLongDate,
+  formatShortDate,
+  formatWeekdayDate,
   isValidISODate,
   toISODate,
   weekdayOf,
@@ -56,5 +58,14 @@ describe('formatLongDate', () => {
     expect(formatLongDate('2026-11-01')).toBe('1er novembre');
     expect(formatLongDate('2027-01-31', true)).toBe('31 janvier 2027');
     expect(formatLongDate('2026-11-11')).toBe('11 novembre');
+  });
+});
+
+describe('formats courts', () => {
+  it('formate les dates courtes et avec le jour', () => {
+    expect(formatShortDate('2026-11-03')).toBe('3 nov.');
+    expect(formatShortDate('2026-11-01')).toBe('1er nov.');
+    expect(formatWeekdayDate('2026-11-02')).toBe('Lundi 2 novembre');
+    expect(formatWeekdayDate('2026-12-01')).toBe('Mardi 1er décembre');
   });
 });
