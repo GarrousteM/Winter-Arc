@@ -1,0 +1,59 @@
+/*
+ * Winter Arc — design tokens.
+ * Seule source de vérité pour les couleurs, polices, rayons, bordures et durées.
+ * Toute valeur visuelle de l'app doit provenir de ces variables (voir SPEC.md, Direction artistique).
+ */
+:root {
+  /* Surfaces */
+  --color-bg: #0e1116; /* nuit polaire */
+  --color-surface: #171c24; /* pierre sombre */
+  --color-surface-raised: #1f2630; /* pierre surélevée */
+  --color-border: #2c3542; /* fer froid */
+
+  /* Texte */
+  --color-text: #e8ecef; /* neige */
+  --color-text-muted: #8c98a6; /* brume */
+  --color-on-accent: #0e1116; /* texte posé sur l'or */
+
+  /* Accents */
+  --color-accent: #c8a44d; /* or viking : actions, XP */
+  --color-frost: #8fc7e0; /* glace : streaks, jokers de gel */
+
+  /* États */
+  --color-success: #7fb685; /* aurore verte */
+  --color-warning: #d9822b; /* torche */
+
+  /* Catégories (usage décoratif : filets, pastilles, icônes ; jamais de texte) */
+  --cat-1: #b5462e; /* braise — Sport */
+  --cat-2: #7a8f5a; /* lichen — Nutrition */
+  --cat-3: #5e8fb0; /* fjord — Lecture */
+  --cat-4: #a8b4c0; /* givre — Temps d'écran */
+  --cat-5: #a0703c; /* cuir — extra 1 */
+  --cat-6: #6b5b95; /* crépuscule — extra 2 */
+
+  /* Typographie */
+  --font-display: 'Cinzel', serif;
+  --font-body: 'Barlow', sans-serif;
+  --font-numeric: 'Barlow Condensed', sans-serif;
+  --tracking-display: 0.12em;
+
+  /* Formes */
+  --radius: 2px;
+  --border-width: 1px;
+  --accent-rule: 3px; /* filet de catégorie à gauche des cartes */
+  --notch: 10px; /* taille des coins coupés (clip-path) */
+  --double-rule-gap: 3px; /* écart du double filet */
+
+  /* Textures */
+  --grain-opacity: 0.04;
+
+  /* Mouvement */
+  --duration-fast: 150ms;
+  --duration-impact: 200ms;
+  --duration-base: 300ms;
+  --duration-reward: 1200ms;
+  --ease-heavy: cubic-bezier(0.3, 0, 0.1, 1);
+
+  /* Zones tactiles */
+  --touch-min: 44px;
+}
