@@ -2,9 +2,11 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useRef, type ReactNode } from 'react';
 import { useAppStore } from '@/app/store';
 import { copy } from '@/copy';
+import { cn } from '@/lib/cn';
 import { durations, easeHeavy, usePrefersReducedMotion } from '@/lib/motion';
 import { playCrash, playShieldThud, playWarHorn } from '@/lib/sound';
 import { Badge } from '@/ui/Badge';
+import { FjordHorizon } from '@/ui/FjordHorizon';
 import { KnotDivider } from '@/ui/KnotDivider';
 import { RuneRow } from '@/ui/Rune';
 import { RuneStone } from '@/ui/RuneStone';
@@ -324,6 +326,11 @@ function RewardOverlay({ event, onClose }: { event: RewardEvent; onClose: () => 
     };
   }, [onClose]);
 
+  // Horizon de fjord sous les écrans de voyage : retour, récap, nouveau rang.
+  const horizon =
+    event.kind === 'return' ||
+    event.kind === 'recap' ||
+    (event.kind === 'level' && event.rankChanged);
   return (
     <motion.button
       ref={ref}
@@ -331,12 +338,18 @@ function RewardOverlay({ event, onClose }: { event: RewardEvent; onClose: () => 
       role="alertdialog"
       aria-label={label(event)}
       onClick={onClose}
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-bg px-6 text-center"
+      className={cn(
+        'fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-bg px-6 text-center',
+        horizon && 'pb-[min(30dvh,260px)]',
+      )}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: durations.base }}
     >
+      {horizon && (
+        <FjordHorizon className="pointer-events-none absolute inset-x-0 bottom-0 h-[min(30dvh,260px)] w-full" />
+      )}
       <RewardContent event={event} />
       <KnotDivider className="w-full max-w-xs" />
       <span className="eyebrow">{r.tapToClose}</span>
