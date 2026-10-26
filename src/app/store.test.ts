@@ -1,6 +1,7 @@
 import 'fake-indexeddb/auto';
 import { goalSuggestions } from '@/features/goals/suggestions';
 import { targetOn } from '@/features/goals/goalModel';
+import { toISODate } from '@/lib/dates';
 import { initialData, useAppStore } from './store';
 
 function setup() {
@@ -102,5 +103,92 @@ describe('store', () => {
     useAppStore.getState().resetAll();
     expect(useAppStore.getState().arc).toBeNull();
     expect(useAppStore.getState().goals).toEqual([]);
+  });
+});
+
+describe('check-ins', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 10, 1, 9));
+    useAppStore.setState({ ...initialData });
+    useAppStore.getState().setupArc({
+      name: 'Arc',
+      startDate: '2026-11-01',
+      endDate: '2027-01-31',
+      categories: [
+        { name: 'Lecture', icon: 'book', colorToken: '--cat-3', goals: goalSuggestions.reading },
+      ],
+    });
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  const pagesId = () => useAppStore.getState().goals[0]?.id ?? '';
+
+  it('crée une seule entrée par objectif et par jour, et recalcule `completed`', () => {
+    const { setCheckIn } = useAppStore.getState();
+    setCheckIn(pagesId(), '2026-11-02', 12);
+    setCheckIn(pagesId(), '2026-11-02', 25);
+    const list = useAppStore.getState().checkIns;
+    expect(list).toHaveLength(1);
+    expect(list[0]).toMatchObject({ value: 25, completed: true });
+  });
+
+  it('efface une saisie', () => {
+    const { setCheckIn } = useAppStore.getState();
+    setCheckIn(pagesId(), '2026-11-02', 12);
+    setCheckIn(pagesId(), '2026-11-02', undefined);
+    expect(useAppStore.getState().checkIns).toEqual([]);
+  });
+
+  it('enregistre et efface la note du jour', () => {
+    const { setDayNote } = useAppStore.getState();
+    setDayNote('2026-11-02', '  Froid mais motivé ');
+    expect(useAppStore.getState().dayNotes).toEqual([
+      { date: '2026-11-02', text: 'Froid mais motivé' },
+    ]);
+    setDayNote('2026-11-02', '  ');
+    expect(useAppStore.getState().dayNotes).toEqual([]);
+  });
+});
+
+describe('Arc commencé avant l’installation', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 10, 3, 9));
+    useAppStore.setState({ ...initialData });
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('fait exister les objectifs de l’onboarding dès le début de l’Arc', () => {
+    useAppStore.getState().setupArc({
+      name: 'Arc',
+      startDate: '2026-11-01',
+      endDate: '2027-01-31',
+      categories: [
+        { name: 'Lecture', icon: 'book', colorToken: '--cat-3', goals: goalSuggestions.reading },
+      ],
+    });
+    const goal = useAppStore.getState().goals[0];
+    expect(goal && toISODate(new Date(goal.createdAt))).toBe('2026-11-01');
+    expect(goal?.targetHistory).toEqual([{ from: '2026-11-01', target: 20 }]);
+  });
+
+  it('fait exister un objectif ajouté ensuite à partir d’aujourd’hui seulement', () => {
+    useAppStore.getState().setupArc({
+      name: 'Arc',
+      startDate: '2026-11-01',
+      endDate: '2027-01-31',
+      categories: [{ name: 'Lecture', icon: 'book', colorToken: '--cat-3', goals: [] }],
+    });
+    const categoryId = useAppStore.getState().categories[0]?.id ?? '';
+    const [pages] = goalSuggestions.reading;
+    if (!pages) throw new Error('suggestion manquante');
+    useAppStore.getState().addGoal({ ...pages, categoryId });
+    const goal = useAppStore.getState().goals[0];
+    expect(goal && toISODate(new Date(goal.createdAt))).toBe('2026-11-03');
   });
 });

@@ -218,8 +218,8 @@ export function StyleguidePage() {
   ]);
   const [sugar, setSugar] = useState(true);
   const [workout, setWorkout] = useState(false);
-  const [pages, setPages] = useState(14);
-  const [screen, setScreen] = useState(95);
+  const [pages, setPages] = useState<number | undefined>(14);
+  const [screen, setScreen] = useState<number | undefined>(undefined);
   const [runePlay, setRunePlay] = useState(0);
   const [textValue, setTextValue] = useState<string>(copy.samples.goalQuantity);
   const [segment, setSegment] = useState<'daily' | 'weekly' | 'days'>('daily');
@@ -388,7 +388,7 @@ export function StyleguidePage() {
               />
             </div>
             <ProgressBar
-              value={pages / 20}
+              value={(pages ?? 0) / 20}
               colorToken="--cat-3"
               label={copy.samples.goalQuantity}
             />
@@ -408,8 +408,8 @@ export function StyleguidePage() {
               />
             </div>
             <ProgressBar
-              value={screen / 120}
-              colorToken={screen > 120 ? '--color-warning' : '--cat-4'}
+              value={(screen ?? 0) / 120}
+              colorToken={(screen ?? 0) > 120 ? '--color-warning' : '--cat-4'}
               label={copy.samples.goalLimit}
             />
           </Card>

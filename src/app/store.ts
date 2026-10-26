@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { isCompleted } from '@/features/checkin/dayModel';
 import { moveInOrder, withTarget, type GoalDraft } from '@/features/goals/goalModel';
-import { today } from '@/lib/dates';
+import { fromISODate, today } from '@/lib/dates';
 import { newId } from '@/lib/id';
 import { idbStorage } from '@/lib/storage';
 import type {
@@ -12,6 +13,7 @@ import type {
   Goal,
   GoalStatus,
   GoalTag,
+  ISODate,
   PlayerState,
   Preferences,
 } from '@/lib/types';
@@ -53,6 +55,9 @@ type AppActions = {
   updateGoal: (id: string, input: GoalInput) => void;
   setGoalStatus: (id: string, status: GoalStatus) => void;
   moveGoal: (id: string, direction: -1 | 1) => void;
+  /** Enregistre une valeur (ou l'efface avec `undefined`) ; `completed` est recalculé. */
+  setCheckIn: (goalId: string, date: string, value: number | undefined) => void;
+  setDayNote: (date: string, text: string) => void;
   resetAll: () => void;
 };
 
@@ -68,7 +73,12 @@ export const initialData: AppData = {
   preferences: { sound: true, vibration: true },
 };
 
-function buildGoal(input: GoalInput, order: number): Goal {
+/**
+ * `since` : premier jour où l'objectif existe. Les objectifs de l'onboarding existent dès le début
+ * de l'Arc, même s'il a commencé avant l'installation, pour pouvoir rattraper ces jours-là.
+ */
+function buildGoal(input: GoalInput, order: number, since?: ISODate): Goal {
+  const from = since && since < today() ? since : today();
   const target = input.type !== 'boolean' ? input.target : undefined;
   return {
     id: newId(),
@@ -76,7 +86,7 @@ function buildGoal(input: GoalInput, order: number): Goal {
     title: input.title.trim(),
     type: input.type,
     ...(target !== undefined ? { target } : {}),
-    targetHistory: target !== undefined ? [{ from: today(), target }] : [],
+    targetHistory: target !== undefined ? [{ from, target }] : [],
     ...(input.unit ? { unit: input.unit.trim() } : {}),
     ...(input.step ? { step: input.step } : {}),
     frequency: input.frequency,
@@ -84,7 +94,7 @@ function buildGoal(input: GoalInput, order: number): Goal {
     status: 'active',
     order,
     ...(input.tag ? { tag: input.tag } : {}),
-    createdAt: new Date().toISOString(),
+    createdAt: (from < today() ? fromISODate(from) : new Date()).toISOString(),
   };
 }
 
@@ -113,7 +123,7 @@ export const useAppStore = create<AppState>()(
           const category = buildCategory(input, index);
           categories.push(category);
           input.goals.forEach((goal, goalIndex) => {
-            goals.push(buildGoal({ ...goal, categoryId: category.id }, goalIndex));
+            goals.push(buildGoal({ ...goal, categoryId: category.id }, goalIndex, setup.startDate));
           });
         });
         set({
@@ -225,6 +235,29 @@ export const useAppStore = create<AppState>()(
             return order === undefined ? g : { ...g, order };
           }),
         });
+      },
+
+      setCheckIn: (goalId, date, value) => {
+        const goal = get().goals.find((g) => g.id === goalId);
+        if (!goal) return;
+        const others = get().checkIns.filter((c) => !(c.goalId === goalId && c.date === date));
+        if (value === undefined) {
+          set({ checkIns: others });
+          return;
+        }
+        const existing = get().checkIns.find((c) => c.goalId === goalId && c.date === date);
+        const checkIn: CheckIn = {
+          ...(existing ?? { id: newId(), goalId, date }),
+          value,
+          completed: isCompleted(goal, value, date),
+        };
+        set({ checkIns: [...others, checkIn] });
+      },
+
+      setDayNote: (date, text) => {
+        const others = get().dayNotes.filter((n) => n.date !== date);
+        const trimmed = text.trim();
+        set({ dayNotes: trimmed ? [...others, { date, text: trimmed }] : others });
       },
 
       resetAll: () => {

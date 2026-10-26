@@ -9,7 +9,8 @@ import {
 } from 'react-router-dom';
 import { GoalsPage } from '@/features/goals/GoalsPage';
 import { AppLayout, RootGate } from './AppLayout';
-import { ProgressPlaceholder, TodayPlaceholder, TrophiesPlaceholder } from './routes/Placeholders';
+import { TodayPage } from '@/features/checkin/TodayPage';
+import { ProgressPlaceholder, TrophiesPlaceholder } from './routes/Placeholders';
 
 // Écrans rarement ouverts chargés à la demande, pour que l'écran Aujourd'hui s'ouvre vite.
 const routes: RouteObject[] = [
@@ -33,7 +34,7 @@ const routes: RouteObject[] = [
       {
         element: <AppLayout />,
         children: [
-          { path: '/', element: <TodayPlaceholder /> },
+          { path: '/', element: <TodayPage /> },
           { path: '/progression', element: <ProgressPlaceholder /> },
           { path: '/trophees', element: <TrophiesPlaceholder /> },
           { path: '/objectifs', element: <GoalsPage /> },
