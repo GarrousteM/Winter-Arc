@@ -1,7 +1,6 @@
 import type { Category, CheckIn, Goal } from '@/lib/types';
 import {
   appearsOn,
-  baseTotalXp,
   dayStates,
   fillableDays,
   goalDayState,
@@ -168,11 +167,6 @@ describe('summarizeDay', () => {
 
   it('n’est pas parfaite sans objectif', () => {
     expect(summarizeDay([]).perfect).toBe(false);
-  });
-
-  it('cumule l’XP sur plusieurs jours', () => {
-    const c = ctx([check('sugar', '2026-11-01', 1, true), check('sugar', '2026-11-02', 1, true)]);
-    expect(baseTotalXp('2026-11-01', '2026-11-02', c)).toBe(40);
   });
 });
 

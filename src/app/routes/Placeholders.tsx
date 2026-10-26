@@ -16,7 +16,3 @@ function ComingSoon({ title, body }: { title: string; body: string }) {
 export function ProgressPlaceholder() {
   return <ComingSoon title={copy.nav.progress} body={p.progress} />;
 }
-
-export function TrophiesPlaceholder() {
-  return <ComingSoon title={copy.nav.trophies} body={p.trophies} />;
-}

@@ -75,10 +75,16 @@ export type DayNote = {
   text: string;
 };
 
+/**
+ * Dernier état de progression déjà célébré (écrans de récompense vus).
+ * La progression elle-même est toujours recalculée depuis l'historique.
+ */
 export type PlayerState = {
   totalXp: number;
   unlockedBadges: { badgeId: string; date: ISODate }[];
   freezeTokens: number;
+  /** Index des semaines dont le boss a déjà été célébré. */
+  defeatedBosses: number[];
 };
 
 export type Preferences = {

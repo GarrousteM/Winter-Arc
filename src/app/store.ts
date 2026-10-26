@@ -58,6 +58,8 @@ type AppActions = {
   /** Enregistre une valeur (ou l'efface avec `undefined`) ; `completed` est recalculé. */
   setCheckIn: (goalId: string, date: string, value: number | undefined) => void;
   setDayNote: (date: string, text: string) => void;
+  /** Mémorise la progression déjà célébrée. */
+  acknowledge: (player: PlayerState) => void;
   resetAll: () => void;
 };
 
@@ -69,7 +71,7 @@ export const initialData: AppData = {
   goals: [],
   checkIns: [],
   dayNotes: [],
-  player: { totalXp: 0, unlockedBadges: [], freezeTokens: 0 },
+  player: { totalXp: 0, unlockedBadges: [], freezeTokens: 0, defeatedBosses: [] },
   preferences: { sound: true, vibration: true },
 };
 
@@ -260,13 +262,25 @@ export const useAppStore = create<AppState>()(
         set({ dayNotes: trimmed ? [...others, { date, text: trimmed }] : others });
       },
 
+      acknowledge: (player) => {
+        set({ player });
+      },
+
       resetAll: () => {
         set({ ...initialData });
       },
     }),
     {
       name: 'winter-arc',
-      version: 1,
+      version: 2,
+      migrate: (persisted, version) => {
+        const data = persisted as AppData;
+        // v1 → v2 : ajout de `player.defeatedBosses`.
+        if (version < 2) {
+          return { ...data, player: { ...initialData.player, ...data.player, defeatedBosses: [] } };
+        }
+        return data;
+      },
       storage: createJSONStorage(() => idbStorage),
       partialize: (state): AppData => ({
         arc: state.arc,

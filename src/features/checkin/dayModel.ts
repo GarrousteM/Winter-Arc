@@ -133,15 +133,6 @@ export function dayStates(date: ISODate, ctx: DayContext): GoalDayState[] {
     .map((g) => goalDayState(g, date, ctx.index));
 }
 
-/** XP de base cumulé sur les jours de l'Arc jusqu'à `until` inclus (moteur complet en phase 4). */
-export function baseTotalXp(start: ISODate, until: ISODate, ctx: DayContext): number {
-  let total = 0;
-  for (let d = start; d <= until; d = addDaysISO(d, 1)) {
-    total += summarizeDay(dayStates(d, ctx)).xp;
-  }
-  return total;
-}
-
 /** Rattrapage possible : le jour même et les 2 jours précédents, jamais de jour futur. */
 export const CATCH_UP_DAYS = 2;
 

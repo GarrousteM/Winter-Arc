@@ -1,8 +1,10 @@
-import { AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { useAppStore } from '@/app/store';
 import { copy } from '@/copy';
+import { FireIcon, SnowflakeIcon } from '@phosphor-icons/react';
 import { levelProgress, rankForLevel } from '@/features/gamification/levels';
+import { useRewardQueue } from '@/features/gamification/rewardQueue';
+import { useGame } from '@/features/gamification/useGame';
 import { iconFor } from '@/features/goals/categoryIcons';
 import { dayNumber, formatLongDate, today } from '@/lib/dates';
 import { vibrate } from '@/lib/haptics';
@@ -13,17 +15,9 @@ import { ProgressRing } from '@/ui/ProgressRing';
 import { RuneRow } from '@/ui/Rune';
 import { Segmented } from '@/ui/Segmented';
 import { ProgressBar } from '@/ui/ProgressBar';
-import {
-  baseTotalXp,
-  dayStates,
-  fillableDays,
-  indexCheckIns,
-  summarizeDay,
-  type DayContext,
-} from './dayModel';
+import { dayStates, fillableDays, indexCheckIns, summarizeDay, type DayContext } from './dayModel';
 import { DayNoteField } from './DayNoteField';
 import { GoalCheckRow } from './GoalCheckRow';
-import { PerfectDayOverlay } from './PerfectDayOverlay';
 
 const t = copy.today;
 
@@ -43,19 +37,17 @@ export function TodayPage() {
   const date = selected && days.includes(selected) ? selected : days[days.length - 1];
 
   const [gains, setGains] = useState<Record<string, { xp: number; key: number }>>({});
-  const [perfectShown, setPerfectShown] = useState(false);
+  const pushPerfect = useRewardQueue((s) => s.pushPerfect);
+  const game = useGame();
 
   const ctx: DayContext = { goals, categories, index: indexCheckIns(checkIns) };
 
   const states = date ? dayStates(date, ctx) : [];
   const summary = summarizeDay(states);
 
-  const totalXp = (() => {
-    if (!arc) return 0;
-    const until = now < arc.endDate ? now : arc.endDate;
-    return until < arc.startDate ? 0 : baseTotalXp(arc.startDate, until, ctx);
-  })();
-  const progress = levelProgress(totalXp);
+  const progress = levelProgress(game?.totalXp ?? 0);
+  const dayResult = game?.days.find((d) => d.date === date);
+  const multiplier = dayResult?.multiplier ?? 1;
 
   const handleChange = (goalId: string, value: number | undefined) => {
     if (!date) return;
@@ -67,9 +59,9 @@ export function TodayPage() {
     const { goals: g, categories: c, checkIns: ci } = useAppStore.getState();
     const afterStates = dayStates(date, { goals: g, categories: c, index: indexCheckIns(ci) });
     const after = afterStates.find((s) => s.goal.id === goalId);
-    const delta =
-      (after ? after.xp.base + after.xp.bonus : 0) -
-      (before ? before.xp.base + before.xp.bonus : 0);
+    // Gain affiché : XP de l'objectif avec le multiplicateur du jour, plus son bonus.
+    const worth = (x: typeof after) => (x ? Math.round(x.xp.base * multiplier) + x.xp.bonus : 0);
+    const delta = worth(after) - worth(before);
     if (delta > 0) {
       setGains((current) => ({
         ...current,
@@ -77,7 +69,7 @@ export function TodayPage() {
       }));
     }
     if (after?.completed && !before?.completed && vibrationOn) vibrate(CHECK_VIBRATION_MS);
-    if (summarizeDay(afterStates).perfect && !beforeSummary.perfect) setPerfectShown(true);
+    if (summarizeDay(afterStates).perfect && !beforeSummary.perfect) pushPerfect(date);
   };
 
   if (!arc) return null;
@@ -120,12 +112,14 @@ export function TodayPage() {
           </span>
         </ProgressRing>
         <div className="flex min-w-0 flex-1 flex-col gap-2">
-          <div className="flex items-baseline gap-2">
-            <span className="eyebrow">{copy.common.level}</span>
+          <div className="flex items-center gap-3">
             <span className="numeric text-4xl text-accent">{progress.level}</span>
-            <span className="truncate font-display text-sm font-bold uppercase tracking-display">
-              {copy.ranks[rankForLevel(progress.level)]}
-            </span>
+            <div className="flex min-w-0 flex-col">
+              <span className="eyebrow">{copy.common.level}</span>
+              <span className="truncate font-display text-sm font-bold uppercase tracking-display">
+                {copy.ranks[rankForLevel(progress.level)]}
+              </span>
+            </div>
           </div>
           <ProgressBar
             value={progress.needed > 0 ? progress.current / progress.needed : 0}
@@ -135,10 +129,36 @@ export function TodayPage() {
             <span className="numeric text-sm text-muted">
               {progress.current} / {progress.needed} {copy.common.xp}
             </span>
-            <span className="numeric text-sm text-accent">{t.xpToday(summary.xp)}</span>
+            <span className="numeric text-sm text-accent">{t.xpToday(dayResult?.xp ?? 0)}</span>
           </div>
         </div>
       </CarvedCard>
+
+      {game && (
+        <div className="flex items-center justify-between gap-3 rounded border border-border bg-surface px-4 py-2">
+          <div className="flex items-baseline gap-2">
+            <FireIcon size={18} className="self-center text-frost" />
+            <span className="eyebrow">{copy.streak.label}</span>
+            <span className="numeric text-2xl text-frost">{game.streak}</span>
+            <span className="text-sm text-muted">{copy.streak.unit(game.streak)}</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="numeric text-lg text-accent">
+              {copy.streak.multiplier(multiplier)}
+            </span>
+            <span
+              className="flex items-center gap-0.5"
+              role="img"
+              aria-label={copy.streak.tokens(game.freezeTokens)}
+            >
+              {Array.from({ length: game.freezeTokens }, (_, i) => (
+                <SnowflakeIcon key={i} size={18} className="text-frost" />
+              ))}
+            </span>
+          </div>
+        </div>
+      )}
+      {dayResult?.frozen && <p className="m-0 text-sm text-frost">{copy.streak.frozenNote}</p>}
 
       {states.length === 0 && <p className="m-0 text-muted">{t.nothingToday}</p>}
 
@@ -176,16 +196,6 @@ export function TodayPage() {
       })}
 
       <DayNoteField key={date} date={date} />
-
-      <AnimatePresence>
-        {perfectShown && (
-          <PerfectDayOverlay
-            onClose={() => {
-              setPerfectShown(false);
-            }}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 }
