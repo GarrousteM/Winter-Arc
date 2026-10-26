@@ -1,16 +1,10 @@
 import { useState } from 'react';
 import { useAppStore } from '@/app/store';
 import { copy } from '@/copy';
-import {
-  CampfireIcon,
-  FireIcon,
-  ShieldStarIcon,
-  SnowflakeIcon,
-  SwordIcon,
-} from '@phosphor-icons/react';
-import { levelProgress, rankForLevel } from '@/features/gamification/levels';
+import { CampfireIcon, FireIcon, SnowflakeIcon } from '@phosphor-icons/react';
+import { levelProgress, nextRankLevel, rankForLevel } from '@/features/gamification/levels';
 import { useRewardQueue } from '@/features/gamification/rewardQueue';
-import { milestones, missingEntries } from '@/features/gamification/retention';
+import { missingEntries } from '@/features/gamification/retention';
 import { useGame } from '@/features/gamification/useGame';
 import { iconFor } from '@/features/goals/categoryIcons';
 import { dayNumber, formatLongDate, today } from '@/lib/dates';
@@ -103,9 +97,10 @@ export function TodayPage() {
 
   const activeCategories = categories.filter((c) => !c.archived).sort((a, b) => a.order - b.order);
   const percent = Math.round(summary.ratio * 100);
+  const rank = rankForLevel(progress.level);
+  const nextRank = nextRankLevel(progress.level);
   const isTruce = restDays.includes(date);
   const campfire = isTruce && summary.completed === 0;
-  const next = game ? milestones(game, now) : undefined;
   // Jours encore rattrapables avec des objectifs non saisis (seulement depuis l'onglet Aujourd'hui).
   const missing =
     date === now
@@ -114,11 +109,6 @@ export function TodayPage() {
           .map((d) => ({ day: d, count: missingEntries(d, ctx) }))
           .filter((m) => m.count > 0)
       : [];
-  // Objectifs affichés mais facultatifs aujourd'hui (hebdomadaire en jour de repos).
-  const optionalNames = states
-    .filter((s) => !s.counts)
-    .map((s) => s.goal.title)
-    .join(', ');
 
   return (
     <div className="flex flex-col gap-6">
@@ -174,50 +164,50 @@ export function TodayPage() {
             <span className="numeric text-base text-text">{t.dayPercent(percent)}</span> ·{' '}
             <span className="numeric text-base text-accent">{t.xpToday(dayResult?.xp ?? 0)}</span>
           </span>
-          {optionalNames && (
-            <span className="text-center text-xs text-frost">{t.optional(optionalNames)}</span>
-          )}
         </section>
       )}
 
-      <div className="flex items-center gap-3 border-y border-border py-2">
-        <span className="numeric text-2xl text-accent">{progress.level}</span>
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
+      <div className="flex flex-col gap-1.5 border-y border-border py-3">
+        <div className="flex items-center justify-between gap-3">
           <span className="truncate font-display text-xs font-bold uppercase tracking-display">
-            {copy.ranks[rankForLevel(progress.level)]}
+            <span className="text-muted">{t.level(progress.level)}</span>
+            <span className="text-muted"> · </span>
+            <span className="text-accent">{copy.ranks[rank]}</span>
           </span>
-          <ProgressBar
-            thin
-            value={progress.needed > 0 ? progress.current / progress.needed : 0}
-            label={`${copy.common.level} ${progress.level}, ${progress.current} / ${progress.needed} ${copy.common.xp}`}
-          />
+          {game && (
+            <span className="flex shrink-0 items-center gap-1.5 text-sm text-frost">
+              <FireIcon size={16} aria-hidden="true" />
+              <span>{t.streak(game.streak)}</span>
+              {multiplier > 1 && (
+                <span className="numeric text-accent">{t.multiplier(multiplier)}</span>
+              )}
+              {game.freezeTokens > 0 && (
+                <span
+                  className="flex items-center gap-0.5"
+                  role="img"
+                  aria-label={copy.streak.tokens(game.freezeTokens)}
+                >
+                  {Array.from({ length: game.freezeTokens }, (_, i) => (
+                    <SnowflakeIcon key={i} size={14} />
+                  ))}
+                </span>
+              )}
+            </span>
+          )}
         </div>
-        {game && (
-          <>
-            <span aria-hidden="true" className="h-7 w-px bg-border" />
-            <span
-              className="flex items-center gap-1"
-              aria-label={`${copy.streak.label} ${game.streak} ${copy.streak.unit(game.streak)}`}
-            >
-              <FireIcon size={16} className="text-frost" />
-              <span className="numeric text-xl text-frost">{game.streak}</span>
-            </span>
-            <span className="numeric text-base text-accent">
-              {copy.streak.multiplier(multiplier)}
-            </span>
-            {game.freezeTokens > 0 && (
-              <span
-                className="flex items-center gap-0.5"
-                role="img"
-                aria-label={copy.streak.tokens(game.freezeTokens)}
-              >
-                {Array.from({ length: game.freezeTokens }, (_, i) => (
-                  <SnowflakeIcon key={i} size={14} className="text-frost" />
-                ))}
-              </span>
-            )}
-          </>
-        )}
+        <ProgressBar
+          thin
+          value={progress.needed > 0 ? progress.current / progress.needed : 0}
+          label={`${copy.common.level} ${progress.level}, ${progress.current} / ${progress.needed} ${copy.common.xp}`}
+        />
+        <div className="flex items-baseline justify-between gap-3 text-xs text-muted">
+          <span className="numeric">
+            {progress.current} / {progress.needed} {copy.common.xp}
+          </span>
+          {nextRank !== undefined && (
+            <span>{t.nextRankAt(copy.ranks[rankForLevel(nextRank)], nextRank)}</span>
+          )}
+        </div>
       </div>
       {dayResult?.frozen && <p className="m-0 text-sm text-frost">{copy.streak.frozenNote}</p>}
 
@@ -228,42 +218,6 @@ export function TodayPage() {
         </p>
       )}
 
-      {date === now && next && (
-        <ul
-          aria-label={t.milestonesLabel}
-          className="m-0 flex list-none flex-col gap-2 p-0 text-sm"
-        >
-          {next.boss && (
-            <li className="flex items-center gap-2">
-              <SwordIcon size={16} className="shrink-0 text-accent" />
-              <span className={next.boss.defeated ? 'text-success' : 'text-text'}>
-                {next.boss.defeated
-                  ? t.bossDefeated(copy.bosses[next.boss.bossId].name)
-                  : t.bossLeft(
-                      copy.bosses[next.boss.bossId].name,
-                      next.boss.toBreak,
-                      next.boss.daysLeft,
-                    )}
-              </span>
-            </li>
-          )}
-          <li className="flex items-center gap-2">
-            <ShieldStarIcon size={16} className="shrink-0 text-accent" />
-            <span>
-              {next.next.kind === 'rank'
-                ? t.nextRank(copy.ranks[next.next.rank], next.next.xp)
-                : t.nextLevel(next.next.level, next.next.xp)}
-            </span>
-          </li>
-          {next.jokerIn !== undefined && (
-            <li className="flex items-center gap-2 text-muted">
-              <SnowflakeIcon size={16} className="shrink-0 text-frost" />
-              <span>{t.jokerIn(next.jokerIn)}</span>
-            </li>
-          )}
-        </ul>
-      )}
-
       {states.length === 0 && <p className="m-0 text-muted">{t.nothingToday}</p>}
 
       {activeCategories.map((category) => {
@@ -272,14 +226,19 @@ export function TodayPage() {
           .sort((a, b) => a.goal.order - b.goal.order);
         if (rows.length === 0) return null;
         return (
-          <section key={category.id} className="flex flex-col" aria-label={category.name}>
-            <CategoryMarker
-              className="pb-1"
-              muted
-              name={category.name}
-              colorToken={category.colorToken}
-              icon={iconFor(category.icon)}
-            />
+          <section key={category.id} className="mt-4 flex flex-col" aria-label={category.name}>
+            {/* En-tête de section : pierre runique, nom, trait gravé jusqu'au compte du jour. */}
+            <div className="flex items-center gap-3 border-b-2 border-border pb-2">
+              <CategoryMarker
+                name={category.name}
+                colorToken={category.colorToken}
+                icon={iconFor(category.icon)}
+              />
+              <span aria-hidden="true" className="h-px flex-1 bg-frost-deep" />
+              <span className="numeric text-sm text-muted">
+                {t.categoryDone(rows.filter((r) => r.completed).length, rows.length)}
+              </span>
+            </div>
             {rows.map((state) => (
               <GoalCheckRow
                 key={`${state.goal.id}-${date}`}
