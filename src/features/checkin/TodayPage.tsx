@@ -8,6 +8,7 @@ import { useGame } from '@/features/gamification/useGame';
 import { iconFor } from '@/features/goals/categoryIcons';
 import { dayNumber, formatLongDate, today } from '@/lib/dates';
 import { vibrate } from '@/lib/haptics';
+import { playShieldThud } from '@/lib/sound';
 import type { ISODate } from '@/lib/types';
 import { CarvedCard } from '@/ui/Card';
 import { CategoryMarker } from '@/ui/CategoryMarker';
@@ -29,6 +30,7 @@ export function TodayPage() {
   const categories = useAppStore((s) => s.categories);
   const checkIns = useAppStore((s) => s.checkIns);
   const vibrationOn = useAppStore((s) => s.preferences.vibration);
+  const soundOn = useAppStore((s) => s.preferences.sound);
   const setCheckIn = useAppStore((s) => s.setCheckIn);
 
   const now = today();
@@ -68,7 +70,10 @@ export function TodayPage() {
         [`${goalId}|${date}`]: { xp: delta, key: Date.now() },
       }));
     }
-    if (after?.completed && !before?.completed && vibrationOn) vibrate(CHECK_VIBRATION_MS);
+    if (after?.completed && !before?.completed) {
+      if (vibrationOn) vibrate(CHECK_VIBRATION_MS);
+      if (soundOn) playShieldThud();
+    }
     if (summarizeDay(afterStates).perfect && !beforeSummary.perfect) pushPerfect(date);
   };
 

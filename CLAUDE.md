@@ -71,6 +71,13 @@ Prises en phase 5 (à confirmer en revue) :
 35. **Détail objectif** : un tap sur un objectif (Progression ou Objectifs) ouvre son détail ; l'édition et l'archivage se font depuis le détail.
 36. **Heatmap** : une seule teinte (glace) en 5 paliers (`--heat-0` à `--heat-4`), liseré or pour une journée parfaite, flocon pour un joker. Courbes en SVG fait main (`src/ui/LineChart.tsx`).
 
+Prises en phase 6 (à confirmer en revue) :
+
+37. **Sauvegarde** : fichier `winter-arc-AAAA-MM-JJ.json` `{ app, schema, exportedAt, data }` ; l'import valide la forme, refuse une version plus récente et remplace tout après confirmation. Sur mobile, l'export passe par la feuille de partage si elle accepte les fichiers.
+38. **Sons** : coup sourd (check), cor de guerre (level-up, version courte pour la journée parfaite), fracas (boss vaincu), coup sourd (badge). Jamais joués sans geste préalable de l'utilisateur.
+39. **Neige de fond** sur les écrans à onglets (20 flocons, derrière le contenu), coupée si mouvement réduit.
+40. **Hébergement** : GitHub Pages via `.github/workflows/deploy.yml` (vérifications puis publication à chaque fusion dans `main`, base `/<nom-du-repo>/`).
+
 ## Choix techniques
 
 - Tailwind 3.4 avec `tailwind.config.ts` ; `colors`, `fontFamily`, `borderRadius`, `borderWidth`, `boxShadow` définis dans `theme` (pas `extend`) pour supprimer les valeurs par défaut.
@@ -79,6 +86,8 @@ Prises en phase 5 (à confirmer en revue) :
 - Store unique Zustand (`src/app/store.ts`) persisté dans IndexedDB (`src/lib/storage.ts`, repli mémoire). `RootGate` attend la réhydratation puis redirige vers `/bienvenue` tant qu'il n'y a pas d'Arc.
 - Styleguide, onboarding et réglages chargés à la demande (`lazy`) ; bibliothèques découpées en chunks (`vite.config.ts`) pour un build sans warning.
 - `hoverOnlyWhenSupported` : pas d'état de survol collé après un tap.
+- PWA : `vite-plugin-pwa` (manifeste, service worker `autoUpdate`, précache de tous les fichiers dont les polices) : fonctionne en mode avion. Icônes dans `public/icons` (rune Hagalaz). Désactivée pour la démo `VITE_ROUTER=memory`.
+- `VITE_BASE` fixe le chemin de publication (routeur : `basename` = `BASE_URL`).
 - Coins coupés : classe `.notched` (clip-path piloté par `--n`) ; un calque intérieur décalé de p px utilise `--n: calc(var(--notch) - 0.586 * p)`.
 
 ## Commandes

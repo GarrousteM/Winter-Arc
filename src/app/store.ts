@@ -60,6 +60,9 @@ type AppActions = {
   setDayNote: (date: string, text: string) => void;
   /** Mémorise la progression déjà célébrée. */
   acknowledge: (player: PlayerState) => void;
+  updatePreferences: (patch: Partial<Preferences>) => void;
+  /** Remplace toutes les données (import d'une sauvegarde). */
+  replaceAll: (data: AppData) => void;
   resetAll: () => void;
 };
 
@@ -264,6 +267,14 @@ export const useAppStore = create<AppState>()(
 
       acknowledge: (player) => {
         set({ player });
+      },
+
+      updatePreferences: (patch) => {
+        set({ preferences: { ...get().preferences, ...patch } });
+      },
+
+      replaceAll: (data) => {
+        set({ ...data });
       },
 
       resetAll: () => {

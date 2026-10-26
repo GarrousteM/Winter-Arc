@@ -55,7 +55,7 @@ const routes: RouteObject[] = [
 const router =
   import.meta.env.VITE_ROUTER === 'memory'
     ? createMemoryRouter(routes, { initialEntries: ['/'] })
-    : createBrowserRouter(routes);
+    : createBrowserRouter(routes, { basename: import.meta.env.BASE_URL.replace(/\/$/, '') || '/' });
 
 // Une seule librairie d'icônes (Phosphor), un seul poids (bold).
 const iconDefaults = { weight: 'bold', size: 24, color: 'currentColor', mirrored: false } as const;

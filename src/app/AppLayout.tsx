@@ -2,6 +2,7 @@ import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { daysInclusive, dayNumber, today } from '@/lib/dates';
 import { AppHeader } from '@/ui/AppHeader';
 import { BottomNav } from '@/ui/BottomNav';
+import { SnowField } from '@/ui/SnowField';
 import { RewardHost } from '@/features/gamification/RewardHost';
 import { useAppStore } from './store';
 
@@ -26,6 +27,7 @@ export function AppLayout() {
   const day = dayNumber(arc.startDate, today());
   return (
     <div className="mx-auto flex min-h-dvh max-w-xl flex-col">
+      <SnowField count={20} />
       <div className="px-4 pt-[max(1rem,env(safe-area-inset-top))]">
         <AppHeader
           day={day}
