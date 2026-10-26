@@ -513,16 +513,10 @@ export function StyleguidePage() {
           <div className="flex flex-col items-center gap-2">
             <span className="eyebrow self-start">{sg.viking.shield}</span>
             <DayShield
-              planks={[
-                { key: 'a', colorToken: '--cat-1', done: false },
-                { key: 'b', colorToken: '--cat-1', done: true },
-                { key: 'c', colorToken: '--cat-2', done: true },
-                { key: 'd', colorToken: '--cat-2', done: true },
-                { key: 'e', colorToken: '--cat-3', done: true },
-                { key: 'f', colorToken: '--cat-4', done: false },
-              ]}
-              center="67"
-              label={copy.today.shieldLabel(4, 6, 67)}
+              done={4}
+              total={5}
+              unit={copy.today.shieldUnit}
+              label={copy.today.shieldLabel(4, 5, 80)}
             />
           </div>
           <div className="flex flex-col gap-2">

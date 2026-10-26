@@ -145,23 +145,3 @@ export function fillableDays(start: ISODate, end: ISODate, now: ISODate): ISODat
   }
   return days;
 }
-
-export type Plank = { goalId: string; colorToken: string; done: boolean };
-
-/** Planches du bouclier du jour : un objectif qui compte = une planche, dans l'ordre d'affichage. */
-export function dayPlanks(states: GoalDayState[], categories: Category[]): Plank[] {
-  const order = new Map(categories.map((c) => [c.id, c.order]));
-  const color = new Map(categories.map((c) => [c.id, c.colorToken]));
-  return states
-    .filter((s) => s.counts)
-    .sort(
-      (a, b) =>
-        (order.get(a.goal.categoryId) ?? 0) - (order.get(b.goal.categoryId) ?? 0) ||
-        a.goal.order - b.goal.order,
-    )
-    .map((s) => ({
-      goalId: s.goal.id,
-      colorToken: color.get(s.goal.categoryId) ?? '--color-accent',
-      done: s.completed,
-    }));
-}

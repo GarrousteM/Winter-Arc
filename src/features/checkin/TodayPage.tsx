@@ -15,14 +15,7 @@ import { DayShield } from '@/ui/DayShield';
 import { RuneRow } from '@/ui/Rune';
 import { Segmented } from '@/ui/Segmented';
 import { ProgressBar } from '@/ui/ProgressBar';
-import {
-  dayPlanks,
-  dayStates,
-  fillableDays,
-  indexCheckIns,
-  summarizeDay,
-  type DayContext,
-} from './dayModel';
+import { dayStates, fillableDays, indexCheckIns, summarizeDay, type DayContext } from './dayModel';
 import { DayNoteField } from './DayNoteField';
 import { GoalCheckRow } from './GoalCheckRow';
 
@@ -100,7 +93,11 @@ export function TodayPage() {
 
   const activeCategories = categories.filter((c) => !c.archived).sort((a, b) => a.order - b.order);
   const percent = Math.round(summary.ratio * 100);
-  const planks = dayPlanks(states, categories);
+  // Objectifs affichés mais facultatifs aujourd'hui (hebdomadaire en jour de repos).
+  const optionalNames = states
+    .filter((s) => !s.counts)
+    .map((s) => s.goal.title)
+    .join(', ');
 
   return (
     <div className="flex flex-col gap-6">
@@ -118,14 +115,18 @@ export function TodayPage() {
 
       <section aria-label={t.progressLabel} className="flex flex-col items-center gap-3">
         <DayShield
-          planks={planks.map((p) => ({ key: p.goalId, colorToken: p.colorToken, done: p.done }))}
-          center={String(percent)}
+          done={summary.completed}
+          total={summary.counted}
+          unit={t.shieldUnit}
           label={t.shieldLabel(summary.completed, summary.counted, percent)}
         />
         <span className="text-sm text-muted">
-          {t.planks(summary.completed, summary.counted)} ·{' '}
+          <span className="numeric text-base text-text">{t.dayPercent(percent)}</span> ·{' '}
           <span className="numeric text-base text-accent">{t.xpToday(dayResult?.xp ?? 0)}</span>
         </span>
+        {optionalNames && (
+          <span className="text-center text-xs text-frost">{t.optional(optionalNames)}</span>
+        )}
       </section>
 
       <div className="flex items-center gap-3 border-y border-border py-2">
