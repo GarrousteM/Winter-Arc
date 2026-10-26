@@ -7,13 +7,18 @@
 @layer base {
   html {
     color-scheme: dark;
+    /* Fond propre au html : le ciel du body ne se propage pas au canevas et reste en haut. */
+    background-color: var(--color-bg);
     -webkit-text-size-adjust: 100%;
   }
 
   body {
     margin: 0;
     min-height: 100dvh;
-    background-color: var(--color-bg);
+    /* Ciel polaire : léger bleu en haut d'écran qui se fond dans la nuit (bleu sur bleu, pas de violet). */
+    background:
+      linear-gradient(180deg, var(--color-sky) 0, var(--color-bg) 26rem) no-repeat,
+      var(--color-bg);
     color: var(--color-text);
     font-family: var(--font-body);
     font-weight: 400;
@@ -120,5 +125,25 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translate3d(0, 24px, 0);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

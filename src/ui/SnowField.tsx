@@ -40,7 +40,7 @@ export function SnowField({ count = 36 }: SnowFieldProps) {
       {flakes.map((f) => (
         <span
           key={f.id}
-          className="absolute top-0 rounded-full bg-text"
+          className="absolute top-0 rounded-full bg-frost"
           style={{
             left: `${f.left}%`,
             width: f.size,

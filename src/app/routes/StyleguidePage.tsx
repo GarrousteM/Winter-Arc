@@ -34,6 +34,9 @@ import { futhark } from '@/ui/runes';
 import { SnowField } from '@/ui/SnowField';
 import { Stepper } from '@/ui/Stepper';
 import { XpBar } from '@/ui/XpBar';
+import { Field, TextInput } from '@/ui/Field';
+import { Segmented, ToggleChip } from '@/ui/Segmented';
+import { Sheet } from '@/ui/Sheet';
 
 const sg = copy.styleguide;
 
@@ -46,6 +49,8 @@ const baseTokens = [
   { token: '--color-text-muted', name: 'Brume' },
   { token: '--color-accent', name: 'Or viking' },
   { token: '--color-frost', name: 'Glace' },
+  { token: '--color-frost-deep', name: 'Acier des fjords' },
+  { token: '--color-sky', name: 'Ciel polaire' },
   { token: '--color-success', name: 'Aurore verte' },
   { token: '--color-warning', name: 'Torche' },
 ];
@@ -146,7 +151,9 @@ const verdictClass: Record<ContrastLevel, string> = {
 function ContrastTable({ values }: { values: Record<string, string> }) {
   const foregrounds = [
     ...baseTokens.filter(
-      (t) => !backgrounds.some((b) => b.token === t.token) && t.token !== '--color-border',
+      (t) =>
+        !backgrounds.some((b) => b.token === t.token) &&
+        !['--color-border', '--color-frost-deep', '--color-sky'].includes(t.token),
     ),
     ...categoryTokens,
   ];
@@ -214,6 +221,10 @@ export function StyleguidePage() {
   const [pages, setPages] = useState(14);
   const [screen, setScreen] = useState(95);
   const [runePlay, setRunePlay] = useState(0);
+  const [textValue, setTextValue] = useState<string>(copy.samples.goalQuantity);
+  const [segment, setSegment] = useState<'daily' | 'weekly' | 'days'>('daily');
+  const [chips, setChips] = useState<number[]>([1, 3, 5]);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   return (
     <div className="relative">
@@ -402,6 +413,79 @@ export function StyleguidePage() {
               label={copy.samples.goalLimit}
             />
           </Card>
+        </Section>
+
+        <Section title={sg.sections.forms}>
+          <Field label={copy.goalForm.title}>
+            {({ id }) => (
+              <TextInput
+                id={id}
+                value={textValue}
+                onChange={(e) => {
+                  setTextValue(e.target.value);
+                }}
+              />
+            )}
+          </Field>
+          <Field label={copy.goalForm.target} error={copy.goalForm.errors.target}>
+            {({ id, describedBy, invalid }) => (
+              <TextInput
+                id={id}
+                aria-describedby={describedBy}
+                aria-invalid={invalid}
+                value="0"
+                readOnly
+              />
+            )}
+          </Field>
+          <Segmented
+            label={copy.goalForm.frequency}
+            value={segment}
+            onChange={setSegment}
+            options={(['daily', 'weekly', 'days'] as const).map((value) => ({
+              value,
+              label: copy.goalForm.frequencies[value],
+            }))}
+          />
+          <div className="flex flex-wrap gap-2">
+            {copy.goalForm.weekdays.map((label, i) => (
+              <ToggleChip
+                key={i}
+                label={label}
+                ariaLabel={copy.goalForm.weekdayNames[i]}
+                pressed={chips.includes(i)}
+                onPressedChange={(pressed) => {
+                  setChips((c) => (pressed ? [...c, i] : c.filter((x) => x !== i)));
+                }}
+              />
+            ))}
+          </div>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setSheetOpen(true);
+            }}
+          >
+            {sg.forms.openSheet}
+          </Button>
+          <Sheet
+            open={sheetOpen}
+            onOpenChange={setSheetOpen}
+            title={copy.goalForm.newTitle}
+            closeLabel={copy.goalForm.close}
+            footer={
+              <Button
+                block
+                onClick={() => {
+                  setSheetOpen(false);
+                }}
+              >
+                {copy.goalForm.create}
+              </Button>
+            }
+          >
+            <p className="m-0 text-muted">{sg.forms.sheetBody}</p>
+          </Sheet>
         </Section>
 
         <Section title={sg.sections.ornaments}>

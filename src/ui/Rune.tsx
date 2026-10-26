@@ -8,7 +8,7 @@ type RuneProps = {
   colorToken?: string;
 };
 
-export function Rune({ name, size = 16, colorToken = '--color-border' }: RuneProps) {
+export function Rune({ name, size = 16, colorToken = '--color-frost-deep' }: RuneProps) {
   return (
     <svg
       aria-hidden="true"
@@ -53,8 +53,8 @@ export function RuneRow({
           fill="none"
           strokeWidth={1.5}
           strokeLinecap="square"
-          initial={{ stroke: 'var(--color-border)' }}
-          animate={{ stroke: lit ? 'var(--color-accent)' : 'var(--color-border)' }}
+          initial={{ stroke: 'var(--color-frost-deep)' }}
+          animate={{ stroke: lit ? 'var(--color-accent)' : 'var(--color-frost-deep)' }}
           transition={{
             duration: reduced ? 0 : durations.base,
             delay: reduced || !lit ? 0 : i * 0.12,

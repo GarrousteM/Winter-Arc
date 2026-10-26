@@ -4,6 +4,8 @@ import type { Config } from 'tailwindcss';
 // Les clés sont définies dans `theme` (et non `extend`) pour supprimer la palette Tailwind par défaut.
 const config: Config = {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
+  // Pas d'état de survol collé après un tap sur écran tactile.
+  future: { hoverOnlyWhenSupported: true },
   theme: {
     colors: {
       transparent: 'transparent',
@@ -17,6 +19,8 @@ const config: Config = {
       'on-accent': 'var(--color-on-accent)',
       accent: 'var(--color-accent)',
       frost: 'var(--color-frost)',
+      'frost-deep': 'var(--color-frost-deep)',
+      sky: 'var(--color-sky)',
       success: 'var(--color-success)',
       warning: 'var(--color-warning)',
       cat: {

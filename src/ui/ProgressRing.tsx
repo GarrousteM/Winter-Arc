@@ -49,7 +49,7 @@ export function ProgressRing({
               y1={center - Math.cos(angle) * inner}
               x2={center + Math.sin(angle) * outer}
               y2={center - Math.cos(angle) * outer}
-              stroke="var(--color-border)"
+              stroke="var(--color-frost-deep)"
               strokeWidth={1}
             />
           );
