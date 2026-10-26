@@ -80,7 +80,7 @@ Prises en phase 6 (à confirmer en revue) :
 
 Direction « Saga gravée » (validée par Max après la phase 6) :
 
-41. **Bouclier du jour** à la place de l'anneau : une planche par objectif qui compte, peinte à la couleur de sa catégorie une fois réussi ; % sur la bosse en fer.
+41. **Bouclier du jour** (variante A, choisie par Max) : le bord en or se remplit comme une jauge (objectifs réussis / objectifs à faire aujourd'hui), le compte « 4/5 objectifs » est gravé sur la bosse, le % et l'XP du jour sont écrits dessous ; les hebdomadaires en jour de repos sont signalés « facultatif ». Les planches de bois sont un simple décor.
 42. **Bâton de comptage** sous « Jour X / N » dans l'en-tête des onglets : une encoche par jour, en or pour les jours écoulés, une marque par semaine.
 43. **Cases à cocher en petits boucliers ronds** ; catégories marquées d'une **pierre runique** ; objectifs en liste séparée par des traits gravés (sans cartes).
 44. **Boss gravé dans une pierre runique à bande-serpent** ; PV en **mur de 10 boucliers** (un bouclier entamé tient ; 8 à briser = 80 %). Nouveau rang dans une pierre à bande dorée.

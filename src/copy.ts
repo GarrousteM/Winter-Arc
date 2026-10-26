@@ -67,9 +67,10 @@ export const copy = {
     dayLabels: { 0: "Aujourd'hui", 1: 'Hier', 2: 'Avant-hier' } as Record<number, string>,
     progressLabel: 'Progression du jour',
     shieldLabel: (done: number, total: number, percent: number) =>
-      `Bouclier du jour : ${done} planche${done > 1 ? 's' : ''} peinte${done > 1 ? 's' : ''} sur ${total}, ${percent} %`,
-    planks: (done: number, total: number) =>
-      `${done} planche${done > 1 ? 's' : ''} peinte${done > 1 ? 's' : ''} sur ${total}`,
+      `Bouclier du jour : ${done} objectif${done > 1 ? 's' : ''} sur ${total} réussi${done > 1 ? 's' : ''}, ${percent} %`,
+    shieldUnit: 'objectifs',
+    dayPercent: (percent: number) => `${percent} % de la journée`,
+    optional: (names: string) => `${names} : facultatif aujourd’hui (repos possible)`,
     tallyLabel: (day: number, total: number) => `Bâton de comptage : jour ${day} sur ${total}`,
     completedOf: (done: number, total: number) => `${done} / ${total}`,
     xpToday: (xp: number) => `+${xp} ce jour`,
@@ -465,7 +466,7 @@ export const copy = {
       limit: 'Objectif limite',
     },
     viking: {
-      shield: 'Bouclier du jour (une planche par objectif)',
+      shield: 'Bouclier du jour : le bord en or se remplit, le compte sur la bosse',
       tally: 'Bâton de comptage (une encoche par jour)',
       ironCard: 'Carte en fer riveté',
       ironCardGilded: 'Carte clé cerclée d’or',
