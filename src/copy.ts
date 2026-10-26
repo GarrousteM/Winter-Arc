@@ -86,13 +86,18 @@ export const copy = {
       `${day} : ${n} objectif${n > 1 ? 's' : ''} non saisi${n > 1 ? 's' : ''}`,
     missingCta: 'Compléter',
     truceDay: 'Jour de trêve : ta série est en pause, rien n’est perdu.',
+    truceTitle: 'Jour de trêve',
+    truceRest:
+      'Ta série est en pause, rien n’est perdu. Si tu t’entraînes quand même, la journée compte normalement.',
     completedOf: (done: number, total: number) => `${done} / ${total}`,
     xpToday: (xp: number) => `+${xp} ce jour`,
     nothingToday: 'Aucun objectif prévu ce jour-là.',
     beforeStartTitle: 'Veille de l’hiver',
-    beforeStart: (date: string) => `Les premiers check-ins s’ouvrent le ${date}.`,
+    beforeStart: (date: string) =>
+      `Le drakkar attend au port. Les premiers check-ins s’ouvrent le ${date}.`,
     afterEndTitle: 'L’hiver est passé',
-    afterEnd: 'Cet Arc est terminé. Les statistiques restent dans l’onglet Progression.',
+    afterEnd:
+      'Le drakkar est rentré au port. Cet Arc est terminé ; les statistiques restent dans l’onglet Progression.',
     weekly: (done: number, times: number) => `${done} / ${times} cette semaine`,
     weeklyDone: 'Quota de la semaine atteint',
     restDay: 'Repos possible aujourd’hui',
