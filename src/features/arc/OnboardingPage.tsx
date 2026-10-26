@@ -25,6 +25,7 @@ import {
 } from '@/lib/dates';
 import { newId } from '@/lib/id';
 import { durations, easeHeavy, usePrefersReducedMotion } from '@/lib/motion';
+import { FimbulLogo } from '@/ui/FimbulLogo';
 import { Button, IconButton } from '@/ui/Button';
 import { Card } from '@/ui/Card';
 import { CategoryMarker } from '@/ui/CategoryMarker';
@@ -189,6 +190,13 @@ export function OnboardingPage() {
       <main className="flex flex-1 flex-col gap-6 px-4 pt-6 pb-32">
         {step === 1 && (
           <>
+            <div className="flex flex-col items-center gap-1 text-center">
+              <FimbulLogo size={96} />
+              <span className="font-display text-3xl font-black uppercase tracking-display">
+                {copy.app.name}
+              </span>
+              <span className="text-sm text-muted">{copy.app.tagline}</span>
+            </div>
             <StepTitle title={t.arc.title} intro={t.arc.intro} />
             <Field
               label={t.arc.name}

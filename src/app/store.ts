@@ -296,6 +296,7 @@ export const useAppStore = create<AppState>()(
       },
     }),
     {
+      // Clé historique (ancien nom Winter Arc) : la changer perdrait les données déjà enregistrées.
       name: 'winter-arc',
       version: 3,
       migrate: (persisted, version) => {

@@ -21,8 +21,8 @@ export default defineConfig({
       injectRegister: 'auto',
       includeAssets: ['icons/favicon-32.png', 'icons/apple-touch-icon.png', 'icons/icon.svg'],
       manifest: {
-        name: 'Winter Arc',
-        short_name: 'Winter Arc',
+        name: 'Fimbul',
+        short_name: 'Fimbul',
         description: 'Ton défi de 92 jours, transformé en jeu de progression.',
         lang: 'fr',
         start_url: base,

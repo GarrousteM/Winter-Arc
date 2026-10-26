@@ -2,6 +2,7 @@ import type { AppData } from '@/app/store';
 
 // Export / import JSON de toutes les données (SPEC.md, « Modèle de données »). Fonctions pures.
 
+// Identifiant historique (l'app s'appelait Winter Arc) : conservé pour relire les anciennes sauvegardes.
 export const BACKUP_APP = 'winter-arc';
 export const BACKUP_SCHEMA = 3;
 
@@ -17,7 +18,7 @@ export function buildBackup(data: AppData, now: Date = new Date()): Backup {
 }
 
 export function backupFileName(date: string): string {
-  return `winter-arc-${date}.json`;
+  return `fimbul-${date}.json`;
 }
 
 export type ImportError = 'json' | 'format' | 'version';
@@ -87,7 +88,7 @@ function validData(d: unknown): d is AppData {
   return true;
 }
 
-/** Lit un fichier de sauvegarde ; refuse tout ce qui ne ressemble pas à un export Winter Arc. */
+/** Lit un fichier de sauvegarde ; refuse tout ce qui ne ressemble pas à un export Fimbul. */
 export function parseBackup(text: string): ImportResult {
   let raw: unknown;
   try {

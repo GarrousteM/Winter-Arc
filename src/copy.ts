@@ -1,7 +1,8 @@
 // Tous les textes de l'interface. Fichier relu par Max : aucun texte en dur dans les composants.
 export const copy = {
   app: {
-    name: 'Winter Arc',
+    name: 'Fimbul',
+    tagline: 'Survis au Grand Hiver',
   },
   nav: {
     today: "Aujourd'hui",
@@ -418,7 +419,7 @@ export const copy = {
     importDone: 'Sauvegarde importée',
     importErrors: {
       json: 'Ce fichier n’est pas lisible (JSON invalide).',
-      format: 'Ce fichier n’est pas une sauvegarde Winter Arc.',
+      format: 'Ce fichier n’est pas une sauvegarde Fimbul.',
       version: 'Cette sauvegarde vient d’une version plus récente de l’app.',
     },
     importWarning: 'L’import remplace l’Arc, les objectifs et tout l’historique de cet appareil.',
