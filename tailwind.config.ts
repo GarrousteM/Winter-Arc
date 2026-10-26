@@ -19,6 +19,8 @@ const config: Config = {
       'on-accent': 'var(--color-on-accent)',
       accent: 'var(--color-accent)',
       frost: 'var(--color-frost)',
+      'frost-deep': 'var(--color-frost-deep)',
+      sky: 'var(--color-sky)',
       success: 'var(--color-success)',
       warning: 'var(--color-warning)',
       cat: {

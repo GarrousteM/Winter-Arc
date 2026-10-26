@@ -34,15 +34,15 @@ export function KnotDivider({
           </clipPath>
           <pattern id={`${id}-p`} width="24" height="12" patternUnits="userSpaceOnUse">
             <g fill="none" strokeWidth="1.25">
-              <path d={strandA} stroke="var(--color-border)" />
-              <path d={strandB} stroke="var(--color-border)" />
+              <path d={strandA} stroke="var(--color-frost-deep)" />
+              <path d={strandB} stroke="var(--color-frost-deep)" />
               <g clipPath={`url(#${id}-l)`}>
                 <path d={strandA} stroke={bg} strokeWidth="4" />
-                <path d={strandA} stroke="var(--color-border)" />
+                <path d={strandA} stroke="var(--color-frost-deep)" />
               </g>
               <g clipPath={`url(#${id}-r)`}>
                 <path d={strandB} stroke={bg} strokeWidth="4" />
-                <path d={strandB} stroke="var(--color-border)" />
+                <path d={strandB} stroke="var(--color-frost-deep)" />
               </g>
             </g>
           </pattern>

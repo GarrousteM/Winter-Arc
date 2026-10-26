@@ -5,19 +5,21 @@
  */
 :root {
   /* Surfaces */
-  --color-bg: #0e1116; /* nuit polaire */
-  --color-surface: #171c24; /* pierre sombre */
-  --color-surface-raised: #1f2630; /* pierre surélevée */
-  --color-border: #2c3542; /* fer froid */
+  --color-bg: #0b111a; /* nuit polaire bleutée */
+  --color-sky: #13233a; /* ciel polaire, haut d'écran uniquement */
+  --color-surface: #121b27; /* pierre sombre bleutée */
+  --color-surface-raised: #1a2534; /* pierre surélevée */
+  --color-border: #2a3a4e; /* fer froid */
 
   /* Texte */
-  --color-text: #e8ecef; /* neige */
-  --color-text-muted: #8c98a6; /* brume */
-  --color-on-accent: #0e1116; /* texte posé sur l'or */
+  --color-text: #e6edf3; /* neige */
+  --color-text-muted: #8e9db0; /* brume */
+  --color-on-accent: #0b111a; /* texte posé sur l'or */
 
   /* Accents */
   --color-accent: #c8a44d; /* or viking : actions, XP */
-  --color-frost: #8fc7e0; /* glace : streaks, jokers de gel */
+  --color-frost: #8fc7e0; /* glace : streaks, jokers de gel, neige */
+  --color-frost-deep: #3b5f80; /* acier des fjords : ornements (entrelacs, runes, graduations) */
 
   /* États */
   --color-success: #7fb685; /* aurore verte */

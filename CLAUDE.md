@@ -45,6 +45,8 @@ Prises en phase 2 (à confirmer en revue) :
 19. **Durée minimale d'un Arc** : 8 jours (fin au moins 7 jours après le début).
 20. **Archiver une catégorie** retire ses objectifs des écrans sans toucher à leur statut ni à leur historique ; la restaurer les fait revenir.
 
+21. **Bleu hivernal** (demande de Max après la phase 2) : neutres bleutés (`--color-bg` #0B111A, surfaces #121B27 / #1A2534, fer froid #2A3A4E, neige #E6EDF3, brume #8E9DB0), ciel polaire `--color-sky` #13233A en dégradé bleu sur bleu en haut d'écran, `--color-frost-deep` #3B5F80 pour les ornements (entrelacs, runes au repos, graduations), neige en glace. L'or reste réservé aux actions et à l'XP.
+
 ## Choix techniques
 
 - Tailwind 3.4 avec `tailwind.config.ts` ; `colors`, `fontFamily`, `borderRadius`, `borderWidth`, `boxShadow` définis dans `theme` (pas `extend`) pour supprimer les valeurs par défaut.

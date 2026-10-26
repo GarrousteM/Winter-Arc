@@ -49,6 +49,8 @@ const baseTokens = [
   { token: '--color-text-muted', name: 'Brume' },
   { token: '--color-accent', name: 'Or viking' },
   { token: '--color-frost', name: 'Glace' },
+  { token: '--color-frost-deep', name: 'Acier des fjords' },
+  { token: '--color-sky', name: 'Ciel polaire' },
   { token: '--color-success', name: 'Aurore verte' },
   { token: '--color-warning', name: 'Torche' },
 ];
@@ -149,7 +151,9 @@ const verdictClass: Record<ContrastLevel, string> = {
 function ContrastTable({ values }: { values: Record<string, string> }) {
   const foregrounds = [
     ...baseTokens.filter(
-      (t) => !backgrounds.some((b) => b.token === t.token) && t.token !== '--color-border',
+      (t) =>
+        !backgrounds.some((b) => b.token === t.token) &&
+        !['--color-border', '--color-frost-deep', '--color-sky'].includes(t.token),
     ),
     ...categoryTokens,
   ];
