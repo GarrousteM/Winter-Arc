@@ -98,6 +98,8 @@ Illustrations (validées par Max) :
 
 51. **Bestiaire gravé** : chaque boss a sa gravure SVG (`src/features/gamification/bossArt.tsx`, composant `BossEngraving`) : trait en glace, hachures en acier des fjords, or réservé aux yeux et à un détail (cœur de Hrungnir, soleil de Sköll). Vaincu : gravure éteinte (niveaux de gris) barrée d'une entaille d'or. Affichée dans la pierre du boss (Trophées), l'écran « Boss vaincu » et le récap hebdo. Les quatre loups ont chacun leur pose (Fenrir de face enchaîné, Garm assis devant la porte de Hel, Sköll en course vers le soleil, Hati hurlant à la lune).
 
+52. **Horizon de fjord** (`src/ui/FjordHorizon.tsx`) : aurore en fines lignes de glace (sans halo), montagnes et falaises gravées, drakkar dont la lanterne est le seul point d'or. En bas des écrans retour, récap et nouveau rang (hauteur `min(30dvh, 260px)`). Sur Aujourd'hui, décor seulement, dans des zones déjà vides : aurore pâle dans le ciel de l'en-tête, petit drakkar posé sur le jour en cours du bâton de comptage, vignette de fjord en fin de liste.
+
 ## Choix techniques
 
 - Tailwind 3.4 avec `tailwind.config.ts` ; `colors`, `fontFamily`, `borderRadius`, `borderWidth`, `boxShadow` définis dans `theme` (pas `extend`) pour supprimer les valeurs par défaut.
