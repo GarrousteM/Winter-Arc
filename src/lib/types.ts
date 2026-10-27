@@ -36,8 +36,14 @@ export type Difficulty = 1 | 2 | 3;
 /** Étiquette invisible qui relie un objectif aux badges, indépendamment de son titre. */
 export type GoalTag = 'workout' | 'reading-pages' | 'screen-time';
 
-/** Une cible valable à partir d'une date (incluse). */
-export type TargetChange = { from: ISODate; target: number };
+/**
+ * Progression hebdomadaire : la cible bouge de `step` chaque lundi (positif pour une quantité,
+ * négatif pour une limite), sans dépasser `bound`.
+ */
+export type TargetRamp = { step: number; bound?: number };
+
+/** Une cible valable à partir d'une date (incluse), éventuellement en progression. */
+export type TargetChange = { from: ISODate; target: number; ramp?: TargetRamp };
 
 export type GoalStatus = 'active' | 'paused' | 'archived';
 

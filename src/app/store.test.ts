@@ -65,6 +65,19 @@ describe('store', () => {
     expect(updated.tag).toBe('reading-pages');
   });
 
+  it('active une progression hebdomadaire à partir d’aujourd’hui', () => {
+    setup();
+    const pages = useAppStore.getState().goals.find((g) => g.tag === 'reading-pages');
+    if (!pages) throw new Error('objectif manquant');
+    vi.setSystemTime(new Date(2026, 10, 11, 9));
+    useAppStore.getState().updateGoal(pages.id, { ...pages, target: 20, ramp: { step: 5 } });
+    const updated = useAppStore.getState().goals.find((g) => g.id === pages.id);
+    if (!updated) throw new Error('objectif manquant');
+    expect(targetOn(updated, '2026-11-10')).toBe(20);
+    expect(targetOn(updated, '2026-11-16')).toBe(25);
+    expect(updated).not.toHaveProperty('ramp');
+  });
+
   it('réordonne et archive les catégories', () => {
     setup();
     const [sport, lecture] = useAppStore.getState().categories;

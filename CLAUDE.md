@@ -104,6 +104,7 @@ Illustrations (validées par Max) :
 53. **Vignettes gravées** (`src/ui/Vignettes.tsx`) : drakkar à quai sur les écrans « Veille de l'hiver » (avant l'Arc) et « L'hiver est passé » (après) ; feu de camp à la place du bouclier du jour un jour de trêve tant que rien n'est coché (le bouclier revient dès la première coche). Le petit drakkar du bâton reste dans ses bornes avant le début et le dernier jour.
 54. **Nom et logo : Fimbul**, « Survis au Grand Hiver » (le Fimbulvetr des sagas, qui s'achève avec Fenrir, boss final). Le logo est la gravure de Fenrir simplifiée : tête de face, collerette, yeux d'or, soleil noir (`public/icons/*.svg`, PNG générés depuis les SVG ; `src/ui/FimbulLogo.tsx` en tête de l'onboarding). Identifiants internes inchangés pour ne rien perdre : clé IndexedDB `winter-arc`, champ `app` des sauvegardes `winter-arc` ; seul le nom de fichier d'export devient `fimbul-AAAA-MM-JJ.json`. Le nom par défaut d'un Arc reste « Winter Arc AAAA » (c'est le nom du défi).
 55. **Aujourd'hui plus lisible** (demande de Max) : plus de liste de paliers ni de ligne « facultatif » sous le bouclier (l'info reste sur la ligne de l'objectif). Bandeau en clair : « Niveau 8 · Karl », « 7 jours de série », multiplicateur affiché seulement au-delà de ×1 (« ×1,1 XP »), jokers, puis la barre avec « 100 / 375 XP » et « Drengr au niveau 10 ». Chaque catégorie a un en-tête de section : pierre runique, nom, trait gravé, compte du jour « 1 / 3 », et plus d'espace entre les sections.
+56. **Progression hebdomadaire** (demande de Max) : option d'un objectif à quantité ou limite, stockée dans l'entrée d'historique (`TargetChange.ramp { step, bound? }`, pas signé : + pour une quantité, − pour une limite). La cible bouge à chaque lundi passé depuis le début de l'entrée, bornée par le plafond / plancher (une limite ne descend jamais sous 0). Activer, modifier la progression ou changer la cible crée une entrée à partir d'aujourd'hui : les jours passés gardent leur cible. La ligne du jour annonce la marche de lundi (« cible 25, puis 30 pompes dès lundi »).
 
 ## Choix techniques
 
@@ -113,7 +114,7 @@ Illustrations (validées par Max) :
 - Store unique Zustand (`src/app/store.ts`) persisté dans IndexedDB (`src/lib/storage.ts`, repli mémoire). `RootGate` attend la réhydratation puis redirige vers `/bienvenue` tant qu'il n'y a pas d'Arc.
 - Styleguide, onboarding et réglages chargés à la demande (`lazy`) ; bibliothèques découpées en chunks (`vite.config.ts`) pour un build sans warning.
 - `hoverOnlyWhenSupported` : pas d'état de survol collé après un tap.
-- PWA : `vite-plugin-pwa` (manifeste, service worker `autoUpdate`, précache de tous les fichiers dont les polices) : fonctionne en mode avion. Icônes dans `public/icons` (rune Hagalaz). Désactivée pour la démo `VITE_ROUTER=memory`.
+- PWA : `vite-plugin-pwa` (manifeste, service worker `autoUpdate`, précache de tous les fichiers dont les polices) : fonctionne en mode avion. Icônes dans `public/icons` (logo Fimbul, décision 54). Désactivée pour la démo `VITE_ROUTER=memory`.
 - `VITE_BASE` fixe le chemin de publication (routeur : `basename` = `BASE_URL`).
 - Coins coupés : classe `.notched` (clip-path piloté par `--n`) ; un calque intérieur décalé de p px utilise `--n: calc(var(--notch) - 0.586 * p)`.
 
