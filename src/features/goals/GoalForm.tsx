@@ -4,6 +4,7 @@ import type { Category, Difficulty, Frequency, GoalType, Weekday } from '@/lib/t
 import { cn } from '@/lib/cn';
 import { Field, TextInput } from '@/ui/Field';
 import { Segmented, ToggleChip } from '@/ui/Segmented';
+import { Switch } from '@/ui/Switch';
 import { iconFor } from './categoryIcons';
 import { needsTarget, validateGoalDraft, type GoalDraft, type GoalDraftError } from './goalModel';
 
@@ -40,6 +41,11 @@ export function GoalForm({
   const [target, setTarget] = useState(initial.target?.toString() ?? '');
   const [unit, setUnit] = useState(initial.unit ?? '');
   const [step, setStep] = useState(initial.step?.toString() ?? '');
+  const [rampOn, setRampOn] = useState(initial.ramp !== undefined);
+  const [rampStep, setRampStep] = useState(
+    initial.ramp ? Math.abs(initial.ramp.step).toString() : '',
+  );
+  const [rampBound, setRampBound] = useState(initial.ramp?.bound?.toString() ?? '');
   const [frequencyKind, setFrequencyKind] = useState<Frequency['kind']>(initial.frequency.kind);
   const [timesPerWeek, setTimesPerWeek] = useState(
     initial.frequency.kind === 'weekly' ? initial.frequency.timesPerWeek : 5,
@@ -61,6 +67,17 @@ export function GoalForm({
   const parsedTarget = parseNumber(target);
   const targetChanged = editing && withTarget && parsedTarget !== initial.target;
 
+  // Une quantité progresse vers le haut, une limite vers le bas.
+  const rampSign = type === 'limit' ? -1 : 1;
+  const parsedBound = parseNumber(rampBound);
+  const ramp =
+    withTarget && rampOn
+      ? {
+          step: rampSign * (parseNumber(rampStep) ?? 0),
+          ...(parsedBound !== undefined ? { bound: parsedBound } : {}),
+        }
+      : undefined;
+
   const submit = (event: FormEvent) => {
     event.preventDefault();
     const draft: GoalDraft = {
@@ -70,7 +87,7 @@ export function GoalForm({
       frequency,
       difficulty,
       ...(withTarget
-        ? { target: parsedTarget, unit: unit.trim() || undefined, step: parseNumber(step) }
+        ? { target: parsedTarget, unit: unit.trim() || undefined, step: parseNumber(step), ramp }
         : {}),
     };
     const found = validateGoalDraft(draft);
@@ -188,6 +205,50 @@ export function GoalForm({
           </Field>
           {targetChanged && (
             <p className="col-span-3 m-0 text-sm text-frost">{t.targetChangeHint}</p>
+          )}
+        </div>
+      )}
+
+      {withTarget && type !== 'boolean' && (
+        <div className="flex flex-col gap-2">
+          <Switch
+            checked={rampOn}
+            onChange={setRampOn}
+            label={t.ramp}
+            description={t.rampHint[type]}
+          />
+          {rampOn && (
+            <div className="grid grid-cols-2 gap-3">
+              <Field label={t.rampStep[type]} error={errorFor('ramp')}>
+                {({ id, describedBy, invalid }) => (
+                  <TextInput
+                    id={id}
+                    inputMode="decimal"
+                    value={rampStep}
+                    onChange={(e) => {
+                      setRampStep(e.target.value);
+                    }}
+                    aria-describedby={describedBy}
+                    aria-invalid={invalid}
+                    className="numeric text-lg"
+                  />
+                )}
+              </Field>
+              <Field label={t.rampBound[type]}>
+                {({ id }) => (
+                  <TextInput
+                    id={id}
+                    inputMode="decimal"
+                    value={rampBound}
+                    onChange={(e) => {
+                      setRampBound(e.target.value);
+                    }}
+                    placeholder={t.optional}
+                    className="numeric text-lg"
+                  />
+                )}
+              </Field>
+            </div>
           )}
         </div>
       )}

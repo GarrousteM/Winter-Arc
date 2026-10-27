@@ -84,6 +84,10 @@ export const copy = {
     missingCta: 'Compléter',
     truceDay: 'Jour de trêve : ta série est en pause, rien n’est perdu.',
     truceTitle: 'Jour de trêve',
+    nextTarget: (target: string, unit: string) =>
+      [target, unit, 'dès lundi'].filter(Boolean).join(' '),
+    rampToday: (target: string, next: string, unit: string) =>
+      `cible ${target}, puis ${[next, unit].filter(Boolean).join(' ')} dès lundi`,
     level: (n: number) => `Niveau ${n}`,
     streak: (n: number) => `${n} ${n > 1 ? 'jours' : 'jour'} de série`,
     multiplier: (m: number) => `×${m.toLocaleString('fr-FR')} XP`,
@@ -324,6 +328,14 @@ export const copy = {
     step: 'Pas de saisie',
     targetChangeHint:
       'Une nouvelle cible s’applique à partir d’aujourd’hui. Les jours passés gardent l’ancienne.',
+    ramp: 'Progression chaque semaine',
+    rampHint: {
+      quantity: 'La cible augmente chaque lundi.',
+      limit: 'La limite baisse chaque lundi.',
+    },
+    rampStep: { quantity: 'Hausse / semaine', limit: 'Baisse / semaine' },
+    rampBound: { quantity: 'Plafond', limit: 'Plancher' },
+    optional: 'Facultatif',
     frequency: 'Fréquence',
     frequencies: {
       daily: 'Chaque jour',
@@ -344,6 +356,7 @@ export const copy = {
       title: 'Donne un intitulé.',
       target: 'Indique une cible supérieure à 0.',
       frequency: 'Choisis une fréquence valide.',
+      ramp: 'Indique une progression supérieure à 0 et une borne cohérente avec la cible.',
     },
   },
   goalSummary: {
@@ -352,6 +365,7 @@ export const copy = {
     days: (labels: string) => labels,
     atLeast: (target: string, unit: string) => `${target} ${unit}`.trim(),
     atMost: (target: string, unit: string) => `moins de ${target} ${unit}`.trim(),
+    ramp: (step: string) => `${step} / semaine`,
   },
   categoryForm: {
     newTitle: 'Nouvelle catégorie',

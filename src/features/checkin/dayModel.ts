@@ -1,6 +1,6 @@
-import { targetOn } from '@/features/goals/goalModel';
+import { nextRampStep, targetOn } from '@/features/goals/goalModel';
 import { goalXp, PERFECT_DAY_BONUS, type GoalXp } from '@/features/gamification/xp';
-import { addDaysISO, toISODate, weekdayOf } from '@/lib/dates';
+import { addDaysISO, toISODate, weekdayOf, weekStart } from '@/lib/dates';
 import type { Category, CheckIn, Goal, ISODate } from '@/lib/types';
 
 // Logique pure d'une journée : objectifs du jour, complétion, XP de base. Sans React.
@@ -19,9 +19,7 @@ export function isCompleted(
 }
 
 /** Lundi de la semaine de `date` (semaines du lundi au dimanche). */
-export function weekStart(date: ISODate): ISODate {
-  return addDaysISO(date, 1 - weekdayOf(date));
-}
+export { weekStart };
 
 export function createdOn(goal: Pick<Goal, 'createdAt'>): ISODate {
   return toISODate(new Date(goal.createdAt));
@@ -67,6 +65,8 @@ export type GoalDayState = {
   xp: GoalXp;
   /** Pour un objectif hebdomadaire : réussites de la semaine, ce jour compris. */
   weekly: { done: number; times: number } | undefined;
+  /** Cible du lundi suivant si une progression hebdomadaire la change. */
+  nextTarget: number | undefined;
 };
 
 export function goalDayState(goal: Goal, date: ISODate, index: CheckInIndex): GoalDayState {
@@ -93,6 +93,7 @@ export function goalDayState(goal: Goal, date: ISODate, index: CheckInIndex): Go
     counts,
     xp: goalXp({ type: goal.type, difficulty: goal.difficulty, value, target, completed }),
     weekly,
+    nextTarget: goal.type === 'boolean' ? undefined : nextRampStep(goal, date)?.target,
   };
 }
 

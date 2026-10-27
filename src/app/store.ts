@@ -96,7 +96,10 @@ function buildGoal(input: GoalInput, order: number, since?: ISODate): Goal {
     title: input.title.trim(),
     type: input.type,
     ...(target !== undefined ? { target } : {}),
-    targetHistory: target !== undefined ? [{ from, target }] : [],
+    targetHistory:
+      target !== undefined
+        ? [input.ramp ? { from, target, ramp: input.ramp } : { from, target }]
+        : [],
     ...(input.unit ? { unit: input.unit.trim() } : {}),
     ...(input.step ? { step: input.step } : {}),
     frequency: input.frequency,
@@ -206,7 +209,7 @@ export const useAppStore = create<AppState>()(
         set({
           goals: get().goals.map((goal) => {
             if (goal.id !== id) return goal;
-            const { target: _target, unit, step, tag, ...rest } = input;
+            const { target: _target, ramp, unit, step, tag, ...rest } = input;
             let next: Goal = { ...goal, ...rest, title: input.title.trim() };
             delete next.unit;
             delete next.step;
@@ -221,7 +224,7 @@ export const useAppStore = create<AppState>()(
               delete next.target;
             } else if (input.target !== undefined) {
               // Une nouvelle cible ne vaut qu'à partir d'aujourd'hui : les jours passés gardent la leur.
-              next = withTarget(next, input.target, today());
+              next = withTarget(next, input.target, today(), ramp);
             }
             return next;
           }),

@@ -34,12 +34,21 @@ function subtitle(state: GoalDayState): string {
 }
 
 function valueLine(state: GoalDayState): string {
-  const { value, target, goal } = state;
-  if (value === undefined || target === undefined) return t.notEntered;
+  const { value, target, goal, nextTarget } = state;
   const unit = goal.unit ?? '';
-  return goal.type === 'limit'
-    ? t.limitValue(formatNumber(value), formatNumber(target), unit)
-    : t.progressValue(formatNumber(value), formatNumber(target), unit);
+  if (value === undefined || target === undefined) {
+    // Progression hebdomadaire : cible du jour et marche de lundi, même sans saisie.
+    return nextTarget !== undefined && target !== undefined
+      ? `${t.notEntered} · ${t.rampToday(formatNumber(target), formatNumber(nextTarget), unit)}`
+      : t.notEntered;
+  }
+  const line =
+    goal.type === 'limit'
+      ? t.limitValue(formatNumber(value), formatNumber(target), unit)
+      : t.progressValue(formatNumber(value), formatNumber(target), unit);
+  return nextTarget === undefined
+    ? line
+    : `${line} · ${t.nextTarget(formatNumber(nextTarget), '')}`;
 }
 
 function XpGain({ gain, onDone }: { gain: GoalCheckRowProps['gain']; onDone: () => void }) {

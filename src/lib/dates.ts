@@ -29,6 +29,11 @@ export function dayNumber(start: ISODate, date: ISODate): number {
   return differenceInCalendarDays(fromISODate(date), fromISODate(start)) + 1;
 }
 
+/** Lundi de la semaine (ISO) contenant la date. */
+export function weekStart(date: ISODate): ISODate {
+  return addDaysISO(date, 1 - weekdayOf(date));
+}
+
 export function weekdayOf(iso: ISODate): Weekday {
   return getISODay(fromISODate(iso)) as Weekday;
 }

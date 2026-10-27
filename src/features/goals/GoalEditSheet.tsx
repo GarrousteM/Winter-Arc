@@ -6,6 +6,8 @@ import { Button } from '@/ui/Button';
 import { Sheet } from '@/ui/Sheet';
 import { GoalForm } from './GoalForm';
 import type { GoalDraft } from './goalModel';
+import { today } from '@/lib/dates';
+import { rampOn, targetOn } from './goalModel';
 
 export type GoalSheetTarget = { mode: 'new'; categoryId: string } | { mode: 'edit'; goal: Goal };
 
@@ -69,7 +71,11 @@ export function GoalEditSheet({ target, onClose, onArchived }: GoalEditSheetProp
             categories={active}
             initial={
               target.mode === 'edit'
-                ? target.goal
+                ? {
+                    ...target.goal,
+                    target: targetOn(target.goal, today()),
+                    ramp: rampOn(target.goal, today()),
+                  }
                 : {
                     title: '',
                     categoryId: target.categoryId,
